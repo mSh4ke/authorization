@@ -17,7 +17,7 @@ var (
 
 func (userRep *Userrepository) RegistrateUsers(user *models.User) (*models.User, error) {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	query := fmt.Sprintf("INSERT INTO %s (login,password,role) VALUES ($1,$2,$3) RETURNING user_id", tableUsers)
+	query := fmt.Sprintf("INSERT INTO %s (login,password,role_id) VALUES ($1,$2,$3) RETURNING id", tableUsers)
 
 	if err := userRep.storage.db.QueryRow(query, user.Login, bytes, user.Role).Scan(&user.Id); err != nil {
 		fmt.Println(query)
