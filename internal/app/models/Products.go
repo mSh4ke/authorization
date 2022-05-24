@@ -5,8 +5,8 @@ type Product struct {
 	Name              string `json:"Name"`
 	Slug              string `json:"Slug"`
 	Brand             *Brand
-	SKU               string `json:"SKU "`
+	SKU               string `json:"SKU"`
 	Short_description string `json:"short_description"`
 	Full_description  string `json:"full_description"`
-	Sort              string `json:"sort"`
+	Sort              int    `json:"sort"`
 }

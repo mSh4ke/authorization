@@ -12,7 +12,8 @@ type Storage struct {
 	config *Config
 	db     *sql.DB
 
-	userRepository *Userrepository
+	userRepository           *Userrepository
+	role_permitionRepository *Role_permitionrepository
 }
 
 //Storage Constructor
@@ -49,4 +50,13 @@ func (s *Storage) Users() *Userrepository {
 		storage: s,
 	}
 	return s.userRepository
+}
+func (s *Storage) Role_permitions() *Role_permitionrepository {
+	if s.userRepository != nil {
+		return s.role_permitionRepository
+	}
+	s.role_permitionRepository = &Role_permitionrepository{
+		storage: s,
+	}
+	return s.role_permitionRepository
 }

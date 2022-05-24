@@ -11,7 +11,13 @@ var (
 		return SecretKey, nil
 	}
 )
-var JwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: emptyValidFunc,
-	SigningMethod:       jwt.SigningMethodHS256,
-})
+
+func Middleware() *jwtmiddleware.JWTMiddleware {
+
+	var JwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+		ValidationKeyGetter: emptyValidFunc,
+		SigningMethod:       jwt.SigningMethodHS256,
+	})
+	return JwtMiddleware
+
+}

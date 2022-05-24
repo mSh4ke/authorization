@@ -17,7 +17,7 @@ type FieldSort struct {
 }
 
 type Pages struct {
-	СurrentPage        int `json:"curentpage"`
+	СurrentPage        int `json:"currentpage"`
 	AllPages           int `json:"allpages""`
 	CountsRecordOnPage int `json:"countsrecordonpage"`
 	AllRecords         int `json:"allrecords"`

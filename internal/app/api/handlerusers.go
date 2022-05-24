@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	token  string
-	Bearer string
+	token     string
+	Bearer    string
+	Userlogin string
 )
 
 type Authorization struct {
@@ -40,7 +41,7 @@ func (api *API) RegistratedUser(writer http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(writer).Encode(msg)
 		return
 	}
-	a, err := api.storage.Users().RegistrateUsers(&user)
+	err = api.storage.Users().RegistrateUsers(&user)
 	if err != nil {
 		api.logger.Info("Troubles while registrate new user:", err)
 		msg := Message{
@@ -51,8 +52,13 @@ func (api *API) RegistratedUser(writer http.ResponseWriter, req *http.Request) {
 		writer.WriteHeader(501)
 		json.NewEncoder(writer).Encode(msg)
 	}
+	msg := Message{
+		StatusCode: 201,
+		Message:    "User successfully created.",
+		IsError:    true,
+	}
 	writer.WriteHeader(201)
-	json.NewEncoder(writer).Encode(a)
+	json.NewEncoder(writer).Encode(msg)
 }
 
 func (api *API) PostToAuth(writer http.ResponseWriter, req *http.Request) {
@@ -72,6 +78,7 @@ func (api *API) PostToAuth(writer http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(writer).Encode(msg)
 		return
 	}
+	Userlogin = userFromJson.Login
 	userInDB, ok, err := api.storage.Users().FindByLogin(userFromJson.Login)
 	if err != nil {
 		api.logger.Info("Can not make user search in database:", err)
@@ -111,7 +118,7 @@ func (api *API) PostToAuth(writer http.ResponseWriter, req *http.Request) {
 	}
 	Token := jwt.New(jwt.SigningMethodHS256)
 	claims := Token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(time.Minute * 10).Unix() //Время жизни токена
+	claims["exp"] = time.Now().Add(time.Hour * 8).Unix() //Время жизни токена
 	claims["admin"] = true
 	claims["name"] = userInDB.Login
 	TokenString, err := Token.SignedString(middleware.SecretKey)
@@ -136,7 +143,7 @@ func (api *API) PostToAuth(writer http.ResponseWriter, req *http.Request) {
 		Login:      userInDB.Login,
 		Role:       userInDB.Role,
 		IsError:    true,
-		PS:         "Максим не хочет мне токен отправлять",
+		PS:         "",
 	}
 
 	writer.WriteHeader(201)
