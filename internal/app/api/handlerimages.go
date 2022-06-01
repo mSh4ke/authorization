@@ -16,19 +16,15 @@ var (
 )
 
 func (api *API) Getimages(writer http.ResponseWriter, req *http.Request) {
-	PermisionID = 1
+	fmt.Println(req)
 	initHeaders(writer, req)
 	var (
-		filter models.Filter
+		filter models.PageRequest
 	)
-	fmt.Println("Start operation")
-	pg := models.Pages{}
-	fl := make([]models.FieldFilter, 0)
-	so := make([]models.FieldSort, 0)
-	filter = models.Filter{
+	fl := make([]models.Field, 0)
+
+	filter = models.PageRequest{
 		Fields: &fl,
-		Sorts:  &so,
-		Pages:  &pg,
 	}
 	err := json.NewDecoder(req.Body).Decode(&filter)
 	if err != nil {

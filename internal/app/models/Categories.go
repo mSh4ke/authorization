@@ -1,8 +1,8 @@
 package models
 
 type Categories struct {
-	Id        int    `json:"id_categories"`
+	Id        int    `json:"id"`
 	Name      string `json:"name"`
 	Slug      string `json:"slug"`
-	Parent_id string `json:"parent_id"`
+	Parent_id int    `json:"parent_id"`
 }

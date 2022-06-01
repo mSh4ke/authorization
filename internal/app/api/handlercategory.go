@@ -12,17 +12,15 @@ import (
 )
 
 func (api *API) Getcategories(writer http.ResponseWriter, req *http.Request) {
+	fmt.Println(req)
 	initHeaders(writer, req)
 	var (
-		filter models.Filter
+		filter models.PageRequest
 	)
-	pg := models.Pages{}
-	fl := make([]models.FieldFilter, 0)
-	so := make([]models.FieldSort, 0)
-	filter = models.Filter{
+	fl := make([]models.Field, 0)
+
+	filter = models.PageRequest{
 		Fields: &fl,
-		Sorts:  &so,
-		Pages:  &pg,
 	}
 	err := json.NewDecoder(req.Body).Decode(&filter)
 	if err != nil {
@@ -45,11 +43,11 @@ func (api *API) Getcategories(writer http.ResponseWriter, req *http.Request) {
 	request, err := http.NewRequest("GET", "http://localhost:8085/api/v2/categories", bytes.NewBuffer(byteArr))
 	if err != nil {
 		msg := Message{
-			StatusCode: 500,
-			Message:    "We have some troubles. Try again",
+			StatusCode: 405,
+			Message:    "Not found",
 			IsError:    true,
 		}
-		writer.WriteHeader(500)
+		writer.WriteHeader(405)
 		json.NewEncoder(writer).Encode(msg)
 		return
 	}
@@ -88,6 +86,7 @@ func (api *API) Postcategory(writer http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&category)
 	if err != nil {
 		api.logger.Info("Invalid json recieved from client")
+		api.logger.Info("--------------------------------")
 		msg := Message{
 			StatusCode: 400,
 			Message:    "Provided json is invalid",
@@ -218,6 +217,46 @@ func (api *API) Deletecategory(writer http.ResponseWriter, req *http.Request) {
 	}
 	request.Header.Set("Authorization", Bearer)
 
+	client := &http.Client{}
+	response, error := client.Do(request)
+	if error != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error write respons",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	defer response.Body.Close()
+	fmt.Println(response)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error reading response",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	writer.Write(body)
+}
+
+func (api *API) GetCategoryById(writer http.ResponseWriter, req *http.Request) {
+	request, err := http.NewRequest("GET", "http://localhost:8085/api/v2/category/"+mux.Vars(req)["id"], nil)
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "We have some troubles. Try again",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
 	client := &http.Client{}
 	response, error := client.Do(request)
 	if error != nil {

@@ -64,10 +64,15 @@ func (a *API) configreRouterField() {
 	a.router.Handle(prefix+"/brand/delete/{id}", middleware.Middleware().Handler(
 		http.HandlerFunc(a.DeleteBrands))).Methods("POST")
 
-	a.router.HandleFunc("categories", a.Getcategories).Methods("GET")
-	a.router.HandleFunc("categories", a.Postcategory).Methods("POST")
-	a.router.HandleFunc("categories/{id}", a.Updatecategory).Methods("PUT")
-	a.router.HandleFunc("categories/{id}", a.Deletecategory).Methods("DELETE")
+	a.router.HandleFunc(prefix+"/categories/get/{id}", a.GetCategoryById).Methods("POST")
+	a.router.Handle(prefix+"/categories/get", middleware.Middleware().Handler(
+		http.HandlerFunc(a.Getcategories))).Methods("POST")
+	a.router.Handle(prefix+"/categories/post", middleware.Middleware().Handler(
+		http.HandlerFunc(a.Postcategory))).Methods("POST")
+	a.router.Handle(prefix+"/categories/update/{id}", middleware.Middleware().Handler(
+		http.HandlerFunc(a.Updatecategory))).Methods("POST")
+	a.router.Handle(prefix+"/categories/delete/{id}", middleware.Middleware().Handler(
+		http.HandlerFunc(a.Deletecategory))).Methods("POST")
 
 	a.router.Handle(prefix+"/units/get", middleware.Middleware().Handler(
 		http.HandlerFunc(a.GetBrands))).Methods("POST")
