@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	token     string
-	Bearer    string
-	Userlogin string
+	token  string
+	Bearer string
 )
 
 type Authorization struct {
@@ -62,6 +61,7 @@ func (api *API) RegistratedUser(writer http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) PostToAuth(writer http.ResponseWriter, req *http.Request) {
+
 	initHeaders(writer, req)
 	api.logger.Info("Post to Auth POST /api/v1/user/auth")
 	var userFromJson models.User
@@ -78,7 +78,7 @@ func (api *API) PostToAuth(writer http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(writer).Encode(msg)
 		return
 	}
-	Userlogin = userFromJson.Login
+	middleware.Userlogin = userFromJson.Login
 	userInDB, ok, err := api.storage.Users().FindByLogin(userFromJson.Login)
 	if err != nil {
 		api.logger.Info("Can not make user search in database:", err)

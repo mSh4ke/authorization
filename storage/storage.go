@@ -9,9 +9,8 @@ import (
 
 //Instance of storage
 type Storage struct {
-	config *Config
-	db     *sql.DB
-
+	config                   *Config
+	db                       *sql.DB
 	userRepository           *Userrepository
 	role_permitionRepository *Role_permitionrepository
 }
@@ -52,7 +51,7 @@ func (s *Storage) Users() *Userrepository {
 	return s.userRepository
 }
 func (s *Storage) Role_permitions() *Role_permitionrepository {
-	if s.userRepository != nil {
+	if s.role_permitionRepository != nil {
 		return s.role_permitionRepository
 	}
 	s.role_permitionRepository = &Role_permitionrepository{

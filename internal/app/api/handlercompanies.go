@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func (api *API) Getproducts(writer http.ResponseWriter, req *http.Request) {
+func (api *API) GetCompanies(writer http.ResponseWriter, req *http.Request) {
 	fmt.Println(req)
 	initHeaders(writer, req)
 	var (
@@ -38,172 +38,8 @@ func (api *API) Getproducts(writer http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	request, err := http.NewRequest("GET", "http://localhost:8085/api/v2/products", bytes.NewBuffer(byteArr))
-	if err != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "We have some troubles. Try again",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	fmt.Println(request)
-	client := &http.Client{}
-	response, error := client.Do(request)
-	if error != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "Error write respons",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	defer response.Body.Close()
-	fmt.Println(response)
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "Error reading response",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	writer.Write(body)
-}
-func (api *API) GetProductById(writer http.ResponseWriter, req *http.Request) {
-	request, err := http.NewRequest("GET", "http://localhost:8085/api/v2/product/"+mux.Vars(req)["id"], nil)
-	if err != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "We have some troubles. Try again",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	client := &http.Client{}
-	response, error := client.Do(request)
-	if error != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "Error write respons",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	defer response.Body.Close()
-	fmt.Println(response)
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "Error reading response",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	writer.Write(body)
-}
-func (api *API) Postproducts(writer http.ResponseWriter, req *http.Request) {
-	var brand models.Brand
-
-	prod := models.Product{
-		Brand: &brand,
-	}
-
-	err := json.NewDecoder(req.Body).Decode(&prod)
-	if err != nil {
-		api.logger.Info("Invalid json recieved from client")
-		msg := Message{
-			StatusCode: 400,
-			Message:    "Provided json is invalid",
-			IsError:    true,
-		}
-		writer.WriteHeader(400)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	fmt.Println(&prod)
-	byteArr, err := json.MarshalIndent(prod, "", "   ")
-	if err != nil {
-		log.Fatal(err)
-	}
-	request, err := http.NewRequest("POST", "http://localhost:8085/api/v2/products", bytes.NewBuffer(byteArr))
-	if err != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "We have some troubles. Try again",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-
-	client := &http.Client{}
-	response, error := client.Do(request)
-	if error != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "Error write respons",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	defer response.Body.Close()
-	fmt.Println(response)
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		msg := Message{
-			StatusCode: 500,
-			Message:    "Error reading response",
-			IsError:    true,
-		}
-		writer.WriteHeader(500)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	writer.Write(body)
-}
-func (api *API) Updateproducts(writer http.ResponseWriter, req *http.Request) {
-	var brand models.Brand
-	prod := models.Product{
-		Brand: &brand,
-	}
-	err := json.NewDecoder(req.Body).Decode(&prod)
-	if err != nil {
-		api.logger.Info("Invalid json recieved from client")
-		msg := Message{
-			StatusCode: 400,
-			Message:    "Provided json is invalid",
-			IsError:    true,
-		}
-		writer.WriteHeader(400)
-		json.NewEncoder(writer).Encode(msg)
-		return
-	}
-	fmt.Println(&prod)
-	byteArr, err := json.MarshalIndent(prod, "", "   ")
-	if err != nil {
-		log.Fatal(err)
-	}
 	Bearer := ChekToken()
-	request, err := http.NewRequest("PUT", "http://localhost:8085/api/v2/products/"+mux.Vars(req)["id"], bytes.NewBuffer(byteArr))
+	request, err := http.NewRequest("GET", "http://localhost:8000/api/v3/companies", bytes.NewBuffer(byteArr))
 	if err != nil {
 		msg := Message{
 			StatusCode: 500,
@@ -243,9 +79,171 @@ func (api *API) Updateproducts(writer http.ResponseWriter, req *http.Request) {
 	}
 	writer.Write(body)
 }
-func (api *API) Deleteproducts(writer http.ResponseWriter, req *http.Request) {
+func (api *API) PostCompanies(writer http.ResponseWriter, req *http.Request) {
+	var image models.Images
+	err := json.NewDecoder(req.Body).Decode(&image)
+	if err != nil {
+		api.logger.Info("Invalid json recieved from client")
+		msg := Message{
+			StatusCode: 400,
+			Message:    "Provided json is invalid",
+			IsError:    true,
+		}
+		writer.WriteHeader(400)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	fmt.Println(&image)
+	byteArr, err := json.MarshalIndent(image, "", "   ")
+	if err != nil {
+		log.Fatal(err)
+	}
 	Bearer := ChekToken()
-	request, err := http.NewRequest("DELETE", "http://localhost:8085/api/v2/products/"+mux.Vars(req)["id"], nil)
+	request, err := http.NewRequest("POST", "http://localhost:8000/api/v3/companies", bytes.NewBuffer(byteArr))
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "We have some troubles. Try again",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	request.Header.Set("Authorization", Bearer)
+
+	client := &http.Client{}
+	response, error := client.Do(request)
+	if error != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error write respons",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	defer response.Body.Close()
+	fmt.Println(response)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error reading response",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	writer.Write(body)
+}
+func (api *API) UpdateCompanies(writer http.ResponseWriter, req *http.Request) {
+	var image models.Images
+	err := json.NewDecoder(req.Body).Decode(&image)
+	if err != nil {
+		api.logger.Info("Invalid json recieved from client")
+		msg := Message{
+			StatusCode: 400,
+			Message:    "Provided json is invalid",
+			IsError:    true,
+		}
+		writer.WriteHeader(400)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	fmt.Println(&image)
+	byteArr, err := json.MarshalIndent(image, "", "   ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	Bearer := ChekToken()
+	request, err := http.NewRequest("PUT", "http://localhost:8000/api/v3/companies/"+mux.Vars(req)["id"], bytes.NewBuffer(byteArr))
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "We have some troubles. Try again",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	request.Header.Set("Authorization", Bearer)
+
+	client := &http.Client{}
+	response, error := client.Do(request)
+	if error != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error write respons",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	defer response.Body.Close()
+	fmt.Println(response)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error reading response",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	writer.Write(body)
+}
+func (api *API) DeleteCompanies(writer http.ResponseWriter, req *http.Request) {
+	Bearer := ChekToken()
+	request, err := http.NewRequest("DELETE", "http://localhost:8000/api/v3/companies/"+mux.Vars(req)["id"], nil)
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "We have some troubles. Try again",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	request.Header.Set("Authorization", Bearer)
+
+	client := &http.Client{}
+	response, error := client.Do(request)
+	if error != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error write respons",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	defer response.Body.Close()
+	fmt.Println(response)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		msg := Message{
+			StatusCode: 500,
+			Message:    "Error reading response",
+			IsError:    true,
+		}
+		writer.WriteHeader(500)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	writer.Write(body)
+}
+func (api *API) GetCompaniesById(writer http.ResponseWriter, req *http.Request) {
+	Bearer := ChekToken()
+	request, err := http.NewRequest("GET", "http://localhost:8000/api/v3/companies/"+mux.Vars(req)["id"], nil)
 	if err != nil {
 		msg := Message{
 			StatusCode: 500,

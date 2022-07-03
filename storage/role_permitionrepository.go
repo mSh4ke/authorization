@@ -10,16 +10,20 @@ type Role_permitionrepository struct {
 
 var usersTable = "Users"
 
-func (brRep *Role_permitionrepository) Role(id_per int, log string) bool {
-	query := fmt.Sprintf("Select role_id FROM %s WHERE login = %s ", usersTable, log)
-	fmt.Println(query)
-	var role string
+func (roleRep *Role_permitionrepository) Role(id_per int, log string) bool {
+	var role int
 	var status bool
-	rows := brRep.storage.db.QueryRow(query).Scan(&role)
-
-	fmt.Println(rows)
-	query = fmt.Sprintf("SELECT CASE WHEN EXISTS (Select * FROM roles_permisions WHERE roles_id = %s and permisions_id = %s) THEN 'TRUE' ELSE 'FALSE' END", role, id_per)
+	query := fmt.Sprintf("Select role_id FROM %s WHERE login = '$1' ", usersTable)
 	fmt.Println(query)
-	rows = brRep.storage.db.QueryRow(query).Scan(&status)
+
+	if err := roleRep.storage.db.QueryRow(query, log).Scan(&role); err != nil {
+		fmt.Println(err)
+	}
+
+	query = fmt.Sprintf("SELECT CASE WHEN EXISTS (Select * FROM roles_permisions WHERE roles_id = %d and permisions_id = %d) THEN 'TRUE' ELSE 'FALSE' END", role, id_per)
+	fmt.Println(query)
+	if err := roleRep.storage.db.QueryRow(query).Scan(&status); err != nil {
+		fmt.Println(err)
+	}
 	return status
 }
