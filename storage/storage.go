@@ -9,17 +9,22 @@ import (
 
 //Instance of storage
 type Storage struct {
-	config                   *Config
-	db                       *sql.DB
-	userRepository           *Userrepository
-	role_permitionRepository *Role_permitionrepository
+	config         *Config
+	db             *sql.DB
+	UserRepository *Userrepository
+	RolePermRep    *RolePermRep
+	RoleRep        *roleRepository
 }
 
 //Storage Constructor
 func New(config *Config) *Storage {
-	return &Storage{
-		config: config,
-	}
+	strg := &Storage{config: config}
+
+	strg.UserRepository = &Userrepository{storage: strg}
+	strg.RolePermRep = &RolePermRep{storage: strg}
+	strg.RoleRep = &roleRepository{storage: strg}
+
+	return strg
 }
 
 //Open connection method
@@ -39,23 +44,4 @@ func (storage *Storage) Open() error {
 //Close connection
 func (storage *Storage) Close() {
 	storage.db.Close()
-}
-
-func (s *Storage) Users() *Userrepository {
-	if s.userRepository != nil {
-		return s.userRepository
-	}
-	s.userRepository = &Userrepository{
-		storage: s,
-	}
-	return s.userRepository
-}
-func (s *Storage) Role_permitions() *Role_permitionrepository {
-	if s.role_permitionRepository != nil {
-		return s.role_permitionRepository
-	}
-	s.role_permitionRepository = &Role_permitionrepository{
-		storage: s,
-	}
-	return s.role_permitionRepository
 }

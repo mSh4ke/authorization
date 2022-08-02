@@ -4,26 +4,39 @@ import (
 	"fmt"
 )
 
-type Role_permitionrepository struct {
+type RolePermRep struct {
 	storage *Storage
 }
 
-var usersTable = "Users"
+const usersTable = "users"
+const rolePermTable = "roles_permisions"
+const permTable = "permisions"
 
-func (roleRep *Role_permitionrepository) Role(id_per int, log string) bool {
-	var role int
-	var status bool
-	query := fmt.Sprintf("Select role_id FROM %s WHERE login = '$1' ", usersTable)
-	fmt.Println(query)
-
-	if err := roleRep.storage.db.QueryRow(query, log).Scan(&role); err != nil {
+func (rolePermRep *RolePermRep) CheckPermission(userId int, permString string) (bool, error) {
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s AS rp ", rolePermTable) +
+		fmt.Sprintf("INNER JOIN %s AS u on u.role_id = rp.roles_id ", usersTable) +
+		fmt.Sprintf("INNER JOIN %s AS p on p.name = rp.permisions_id ", permTable) +
+		fmt.Sprintf("WHERE u.id = $1 and permString = $2)")
+	var result bool
+	if err := rolePermRep.storage.db.QueryRow(query, userId, permString).Scan(&result); err != nil {
 		fmt.Println(err)
+		return false, err
 	}
+	return result, nil
+}
 
-	query = fmt.Sprintf("SELECT CASE WHEN EXISTS (Select * FROM roles_permisions WHERE roles_id = %d and permisions_id = %d) THEN 'TRUE' ELSE 'FALSE' END", role, id_per)
-	fmt.Println(query)
-	if err := roleRep.storage.db.QueryRow(query).Scan(&status); err != nil {
-		fmt.Println(err)
+func (RolePermRep *RolePermRep) AddPermission(roleId int, permId int) error {
+	query := fmt.Sprintf("INSERT INTO %s (roles_id,permisions_id) VALUES ($1,$2)", rolePermTable)
+	if _, err := RolePermRep.storage.db.Query(query, roleId, permId); err != nil {
+		return err
 	}
-	return status
+	return nil
+}
+
+func (RolePermRep *RolePermRep) RemovePermission(roleId int, permId int) error {
+	query := fmt.Sprintf("DELETE FROM %s (roles_id,permisions_id) VALUES ($1,$2)", rolePermTable)
+	if _, err := RolePermRep.storage.db.Query(query, roleId, permId); err != nil {
+		return err
+	}
+	return nil
 }

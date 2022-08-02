@@ -1,7 +1,9 @@
-[web-server]
-bind_addr = ":8083"
+bind_addr = ":8080"
 logger_level = "debug"
+secret_key = "your_mom"
+default_role_id = 2
+data_server_url = "localhost:8000/api/v3"
 
 
 [storage]
-database_uri = "host=localhost port=5432 user=postgres password=1234 dbname=Users sslmode=disable"
+database_uri = "host=localhost port=5432 user=postgres password=lthgfhjkm dbname=Users sslmode=disable"

@@ -1,25 +1,22 @@
 package storage
 
 import (
-	"GitHab/Autorization/internal/app/models"
 	"fmt"
+	"github.com/mSh4ke/authorization/models"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 type Userrepository struct {
 	storage *Storage
 }
 
-var (
-	tableUsers string = "Users"
-)
+const tableUsers string = "Users"
 
-func (userRep *Userrepository) RegistrateUsers(user *models.User) error {
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	query := fmt.Sprintf("INSERT INTO %s (login,password,role_id) VALUES ($1,$2,1) RETURNING id", tableUsers)
+func (userRep *Userrepository) RegisterUser(user *models.User) error {
+	query := fmt.Sprintf("INSERT INTO %s (login,password,role_id) VALUES ($1,$2,1)", tableUsers)
 
-	if err := userRep.storage.db.QueryRow(query, user.Login, bytes).Scan(&user.Id); err != nil {
+	if _, err := userRep.storage.db.Query(query, user.Login, user.Password); err != nil {
 		fmt.Println(query)
 		return err
 	}
@@ -27,40 +24,24 @@ func (userRep *Userrepository) RegistrateUsers(user *models.User) error {
 	return nil
 }
 
-func (ur *Userrepository) FindByLogin(login string) (*models.User, bool, error) {
-	users, err := ur.SelectAll()
-	var founded bool
-	if err != nil {
-		return nil, founded, err
+func (userRep *Userrepository) AuthenticateUser(user *models.User) error {
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	query := fmt.Sprintf("SELECT u.id, u.role_id, r.name FROM %s AS u WHERE login = %s AND password = %s", tableUsers, user.Login, bytes) +
+		fmt.Sprintf("LEFT JOIN roles AS r ON u.role_id = r.id")
+	fmt.Println(query)
+	if err := userRep.storage.db.QueryRow(query).Scan(&user.Id, &user.Role.Id, &user.Role.Name); err != nil {
+		logrus.Info(err)
+		return err
 	}
-	var userFinded *models.User
-	for _, u := range users {
-		if u.Login == login {
-			userFinded = u
-			founded = true
-			break
-		}
-	}
-	return userFinded, founded, nil
+	return nil
 }
 
-func (ur *Userrepository) SelectAll() ([]*models.User, error) {
-	query := fmt.Sprintf("SELECT * FROM %s", tableUsers)
-	rows, err := ur.storage.db.Query(query)
-	if err != nil {
-		return nil, err
+func (userRep *Userrepository) AssignRole(userId int, roleId int) error {
+	query := fmt.Sprintf("UPDATE %s SET role_id  = %d WHERE id = %d", tableUsers, roleId, userId)
+	fmt.Println(query)
+	if _, err := userRep.storage.db.Query(query); err != nil {
+		logrus.Info(err)
+		return err
 	}
-	defer rows.Close()
-	users := make([]*models.User, 0)
-	for rows.Next() {
-		u := models.User{}
-		err := rows.Scan(&u.Id, &u.Login, &u.Password, &u.Role)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		users = append(users, &u)
-	}
-	return users, nil
-
+	return nil
 }
