@@ -32,8 +32,9 @@ func (userRep *Userrepository) AuthenticateUser(user *models.User) error {
 	if err != nil {
 		return err
 	}
-	query := fmt.Sprintf("SELECT u.id, u.role_id, r.name FROM %s AS u WHERE login = %s AND password = %s", tableUsers, user.Login, passwordHash) +
-		fmt.Sprintf("LEFT JOIN roles AS r ON u.role_id = r.id")
+	query := fmt.Sprintf("SELECT u.id, u.role_id, r.name FROM %s AS u ", tableUsers) +
+		fmt.Sprintf("LEFT JOIN roles AS r ON u.role_id = r.id") +
+		fmt.Sprintf("WHERE u.login = '%s' AND u.password = '%s'", user.Login, passwordHash)
 	fmt.Println(query)
 	if err := userRep.storage.db.QueryRow(query).Scan(&user.Id, &user.Role.Id, &user.Role.Name); err != nil {
 		logrus.Info(err)
