@@ -26,6 +26,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		if err != nil {
 			fmt.Println("error creating request: ", err)
 			http.Error(writer, "internal error", 500)
+			return
 		}
 
 		client := &http.Client{}
@@ -33,12 +34,14 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		if err != nil {
 			fmt.Println("error sending request: ", err)
 			http.Error(writer, "internal error", 500)
+			return
 		}
 		defer response.Body.Close()
 		responseData, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println("error reading response data: ", err)
 			http.Error(writer, "internal error", 500)
+			return
 		}
 		writer.WriteHeader(200)
 		writer.Write(responseData)

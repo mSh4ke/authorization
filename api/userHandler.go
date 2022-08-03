@@ -13,6 +13,7 @@ func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
 		http.Error(wrt, "invalid json", 400)
+		return
 	}
 	log.Println("user data decoded")
 	log.Println(user)
@@ -22,6 +23,7 @@ func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 		log.Println("failed calculating password hash")
 		log.Println(err)
 		http.Error(wrt, "internal error", 500)
+		return
 	}
 
 	err = api.storage.UserRepository.AuthenticateUser(&user)
@@ -29,6 +31,7 @@ func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 		log.Println("authentication failed")
 		log.Println(err)
 		http.Error(wrt, "password is invalid or user does not exist", 400)
+		return
 	}
 
 	tokenString, err := api.GenerateJWT(user.Id)
@@ -36,6 +39,7 @@ func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 		log.Println("failed generating token")
 		log.Println(err)
 		http.Error(wrt, "internal error", 500)
+		return
 	}
 
 	resp := struct {
@@ -72,12 +76,14 @@ func (api *API) RegisterUser(wrt http.ResponseWriter, req *http.Request) {
 		log.Println("failed calculating password hash")
 		log.Println(err)
 		http.Error(wrt, "internal error", 500)
+		return
 	}
 	err = api.storage.UserRepository.RegisterUser(&user)
 	if err != nil {
 		log.Println("user creation failed")
 		log.Println(err)
 		http.Error(wrt, "invalid user data", 400)
+		return
 	}
 	wrt.WriteHeader(201)
 	json.NewEncoder(wrt).Encode(&user)
