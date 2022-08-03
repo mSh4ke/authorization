@@ -9,7 +9,10 @@ import (
 
 func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	var user models.User
+	role := models.Role{}
+	user := models.User{
+		Role: &role,
+	}
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
 		http.Error(wrt, "invalid json", 400)
@@ -17,14 +20,6 @@ func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 	}
 	log.Println("user data decoded")
 	log.Println(user)
-
-	err = user.HashPassword()
-	if err != nil {
-		log.Println("failed calculating password hash")
-		log.Println(err)
-		http.Error(wrt, "internal error", 500)
-		return
-	}
 
 	err = api.storage.UserRepository.AuthenticateUser(&user)
 	if err != nil {
@@ -72,7 +67,6 @@ func (api *API) RegisterUser(wrt http.ResponseWriter, req *http.Request) {
 	user.Role.Id = api.config.DefaultRoleId
 	log.Println(user)
 	log.Println(role)
-	err = user.HashPassword()
 	if err != nil {
 		log.Println("failed calculating password hash")
 		log.Println(err)

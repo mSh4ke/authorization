@@ -15,11 +15,10 @@ type Role struct {
 	Name string `json:"name"`
 }
 
-func (user *User) HashPassword() error {
+func (user *User) GetHashedPassword() (string, error) {
 	HashBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
-		return err
+		return "", err
 	}
-	user.Password = string(HashBytes)
-	return nil
+	return string(HashBytes), nil
 }

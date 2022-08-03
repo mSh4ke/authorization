@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/mSh4ke/authorization/models"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Userrepository struct {
@@ -14,9 +13,13 @@ type Userrepository struct {
 const tableUsers string = "Users"
 
 func (userRep *Userrepository) RegisterUser(user *models.User) error {
+	passwordHash, err := user.GetHashedPassword()
+	if err != nil {
+		return err
+	}
 	query := fmt.Sprintf("INSERT INTO %s (login,password,role_id) VALUES ($1,$2,1)", tableUsers)
 
-	if _, err := userRep.storage.db.Query(query, user.Login, user.Password); err != nil {
+	if _, err := userRep.storage.db.Query(query, user.Login, passwordHash); err != nil {
 		fmt.Println(query)
 		return err
 	}
@@ -25,8 +28,11 @@ func (userRep *Userrepository) RegisterUser(user *models.User) error {
 }
 
 func (userRep *Userrepository) AuthenticateUser(user *models.User) error {
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	query := fmt.Sprintf("SELECT u.id, u.role_id, r.name FROM %s AS u WHERE login = %s AND password = %s", tableUsers, user.Login, bytes) +
+	passwordHash, err := user.GetHashedPassword()
+	if err != nil {
+		return err
+	}
+	query := fmt.Sprintf("SELECT u.id, u.role_id, r.name FROM %s AS u WHERE login = %s AND password = %s", tableUsers, user.Login, passwordHash) +
 		fmt.Sprintf("LEFT JOIN roles AS r ON u.role_id = r.id")
 	fmt.Println(query)
 	if err := userRep.storage.db.QueryRow(query).Scan(&user.Id, &user.Role.Id, &user.Role.Name); err != nil {
