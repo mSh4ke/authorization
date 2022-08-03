@@ -65,6 +65,7 @@ func (api *API) RegisterUser(wrt http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
 		http.Error(wrt, "invalid json", 400)
+		return
 	}
 	log.Println("user decoded")
 	log.Println("Default role: ", api.config.DefaultRoleId)
