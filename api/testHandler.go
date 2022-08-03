@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/mSh4ke/authorization/models"
 	"io/ioutil"
 	"net/http"
 )
@@ -12,17 +13,18 @@ const HeaderString = "Bearer"
 func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req *http.Request) {
 	return func(writer http.ResponseWriter, req *http.Request) {
 		initHeaders(writer, req)
-		endpoint := mux.Vars(req)["endpoint"]
+		var perm models.Permission
+		perm.Name = mux.Vars(req)["endpoint"]
 		reqToken := req.Header.Get(HeaderString)
 		fmt.Println(reqToken)
 
-		if err := api.ValidateToken(reqToken, endpoint); err != nil {
+		if err := api.ValidateToken(reqToken, &perm); err != nil {
 			api.logger.Info("error validating token: ", err)
 			http.Error(writer, "access denied", 403)
 			return
 		}
 
-		request, err := http.NewRequest(method, endpoint, req.Body)
+		request, err := http.NewRequest(method, perm.ConstructUrl(api), req.Body)
 		if err != nil {
 			fmt.Println("error creating request: ", err)
 			http.Error(writer, "internal error", 500)

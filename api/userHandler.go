@@ -63,8 +63,8 @@ func (api *API) RegisterUser(wrt http.ResponseWriter, req *http.Request) {
 		return
 	}
 	log.Println("user decoded")
-	log.Println("Default role: ", api.config.DefaultRoleId)
-	user.Role.Id = api.config.DefaultRoleId
+	log.Println("Default role: ", api.Config.DefaultRoleId)
+	user.Role.Id = api.Config.DefaultRoleId
 	log.Println(user)
 	log.Println(role)
 	if err != nil {

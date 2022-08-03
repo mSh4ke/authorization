@@ -12,7 +12,7 @@ var (
 
 func (a *API) configreLoggerField() error {
 
-	log_level, err := logrus.ParseLevel(a.config.LoggerLevel)
+	log_level, err := logrus.ParseLevel(a.Config.LoggerLevel)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (a *API) configreRouterField() {
 	a.router.HandleFunc(prefix+"/data/{endpoint}", a.RouteHandler("DELETE")).Methods("DELETE")
 }
 func (a *API) configreStorageField() error {
-	storage := storage.New(a.config.Storage)
+	storage := storage.New(a.Config.Storage)
 
 	if err := storage.Open(); err != nil {
 		return err

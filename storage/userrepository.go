@@ -18,9 +18,9 @@ func (userRep *Userrepository) RegisterUser(user *models.User) error {
 	if err != nil {
 		return err
 	}
-	query := fmt.Sprintf("INSERT INTO %s (login,password,role_id) VALUES ($1,$2,1)", tableUsers)
+	query := fmt.Sprintf("INSERT INTO %s (login,password,role_id) VALUES ($1,$2,$1)", tableUsers)
 
-	if _, err := userRep.storage.db.Query(query, user.Login, passwordHash); err != nil {
+	if _, err := userRep.storage.db.Query(query, user.Login, passwordHash, user.Role.Id); err != nil {
 		fmt.Println(query)
 		return err
 	}

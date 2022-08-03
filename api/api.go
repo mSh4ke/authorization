@@ -10,7 +10,7 @@ import (
 )
 
 type API struct {
-	config  *Config
+	Config  *Config
 	logger  *logrus.Logger
 	router  *mux.Router
 	storage *storage.Storage
@@ -18,7 +18,7 @@ type API struct {
 
 func New(config *Config) *API {
 	return &API{
-		config: config,
+		Config: config,
 		logger: logrus.New(),
 		router: mux.NewRouter(),
 	}
@@ -28,14 +28,14 @@ func (api *API) Start() error {
 	if err := api.configreLoggerField(); err != nil {
 		return err
 	}
-	api.logger.Info("starting api server at port:", api.config.BindAddr)
-	api.logger.Info("Default user role id: ", api.config.DefaultRoleId)
-	api.logger.Info("Secret key: ", api.config.SecretKey)
+	api.logger.Info("starting api server at port:", api.Config.BindAddr)
+	api.logger.Info("Default user role id: ", api.Config.DefaultRoleId)
+	api.logger.Info("Secret key: ", api.Config.SecretKey)
 	api.configreRouterField()
 	if err := api.configreStorageField(); err != nil {
 		return err
 	}
-	return http.ListenAndServe(api.config.BindAddr, api.router)
+	return http.ListenAndServe(api.Config.BindAddr, api.router)
 }
 
 type Message struct {

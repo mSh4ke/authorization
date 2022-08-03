@@ -14,17 +14,16 @@ const usersTable = "users"
 const rolePermTable = "roles_permisions"
 const permTable = "permisions"
 
-func (rolePermRep *RolePermRep) CheckPermission(userId int, permString string) (bool, error) {
-	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s AS rp ", rolePermTable) +
+func (rolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permission) error {
+	query := fmt.Sprintf("SELECT p.server_id FROM %s AS rp ", rolePermTable) +
 		fmt.Sprintf("INNER JOIN %s AS u on u.role_id = rp.roles_id ", usersTable) +
 		fmt.Sprintf("INNER JOIN %s AS p on p.name = rp.permisions_id ", permTable) +
 		fmt.Sprintf("WHERE u.id = $1 and permString = $2)")
-	var result bool
-	if err := rolePermRep.storage.db.QueryRow(query, userId, permString).Scan(&result); err != nil {
+	if err := rolePermRep.storage.db.QueryRow(query, userId, perm.Name).Scan(&perm.ServerId); err != nil {
 		fmt.Println(err)
-		return false, err
+		return err
 	}
-	return result, nil
+	return nil
 }
 
 func (RolePermRep *RolePermRep) AddPermission(roleId int, permId int) error {

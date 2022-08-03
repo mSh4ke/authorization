@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"github.com/form3tech-oss/jwt-go"
+	"github.com/mSh4ke/authorization/models"
 	"time"
 )
 
@@ -20,36 +21,33 @@ func (api *API) GenerateJWT(userId int) (tokenString string, err error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString([]byte(api.config.SecretKey))
+	tokenString, err = token.SignedString([]byte(api.Config.SecretKey))
 	return
 }
 
-func (api *API) ValidateToken(signedToken string, endpoint string) (err error) {
+func (api *API) ValidateToken(signedToken string, perm *models.Permission) error {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
-			return []byte(api.config.SecretKey), nil
+			return []byte(api.Config.SecretKey), nil
 		},
 	)
 	if err != nil {
-		return
+		return err
 	}
 	claims, ok := token.Claims.(*JWTClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
-		return
+		return err
 	}
 	if claims.ExpiresAt < time.Now().Local().Unix() {
 		err = errors.New("token expired")
-		return
+		return err
 	}
-	res, err := api.storage.RolePermRep.CheckPermission(claims.UserId, endpoint)
+	err = api.storage.RolePermRep.CheckPermission(claims.UserId, perm)
 	if err != nil {
 		return err
 	}
-	if !res {
-		err = errors.New("access denied")
-	}
-	return err
+	return nil
 }
