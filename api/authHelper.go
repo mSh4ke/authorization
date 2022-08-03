@@ -20,7 +20,7 @@ func (api *API) GenerateJWT(userId int) (tokenString string, err error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString(api.config.SecretKey)
+	tokenString, err = token.SignedString([]byte(api.config.SecretKey))
 	return
 }
 

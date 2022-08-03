@@ -34,10 +34,10 @@ func (a *API) configreRouterField() {
 	a.router.HandleFunc(prefix+"/admin/removePerm", a.removePerm).Methods("POST")
 
 	//data handlers
-	a.router.HandleFunc(prefix+"{endpoint}", a.RouteHandler("GET")).Methods("GET")
-	a.router.HandleFunc(prefix+"{endpoint}", a.RouteHandler("POST")).Methods("POST")
-	a.router.HandleFunc(prefix+"{endpoint}", a.RouteHandler("PUT")).Methods("PUT")
-	a.router.HandleFunc(prefix+"{endpoint}", a.RouteHandler("DELETE")).Methods("DELETE")
+	a.router.HandleFunc(prefix+"/data/{endpoint}", a.RouteHandler("GET")).Methods("GET")
+	a.router.HandleFunc(prefix+"/data/{endpoint}", a.RouteHandler("POST")).Methods("POST")
+	a.router.HandleFunc(prefix+"/data/{endpoint}", a.RouteHandler("PUT")).Methods("PUT")
+	a.router.HandleFunc(prefix+"/data/{endpoint}", a.RouteHandler("DELETE")).Methods("DELETE")
 }
 func (a *API) configreStorageField() error {
 	storage := storage.New(a.config.Storage)

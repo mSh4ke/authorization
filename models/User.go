@@ -22,3 +22,10 @@ func (user *User) GetHashedPassword() (string, error) {
 	}
 	return string(HashBytes), nil
 }
+
+func (user *User) ValidatePassword(hash []byte) bool {
+	if bcrypt.CompareHashAndPassword(hash, []byte(user.Password)) != nil {
+		return false
+	}
+	return true
+}

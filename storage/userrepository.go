@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"fmt"
 	"github.com/mSh4ke/authorization/models"
 	"github.com/sirupsen/logrus"
@@ -28,17 +29,17 @@ func (userRep *Userrepository) RegisterUser(user *models.User) error {
 }
 
 func (userRep *Userrepository) AuthenticateUser(user *models.User) error {
-	passwordHash, err := user.GetHashedPassword()
-	if err != nil {
-		return err
-	}
-	query := fmt.Sprintf("SELECT u.id, u.role_id, r.name FROM %s AS u ", tableUsers) +
-		fmt.Sprintf("LEFT JOIN roles AS r ON u.role_id = r.id") +
-		fmt.Sprintf("WHERE u.login = '%s' AND u.password = '%s'", user.Login, passwordHash)
+	query := fmt.Sprintf("SELECT u.id, u.password, u.role_id, r.name FROM %s AS u ", tableUsers) +
+		fmt.Sprintf("LEFT JOIN roles AS r ON u.role_id = r.id ") +
+		fmt.Sprintf("WHERE u.login = '%s'", user.Login)
 	fmt.Println(query)
-	if err := userRep.storage.db.QueryRow(query).Scan(&user.Id, &user.Role.Id, &user.Role.Name); err != nil {
+	var passwordHash string
+	if err := userRep.storage.db.QueryRow(query).Scan(&user.Id, &passwordHash, &user.Role.Id, &user.Role.Name); err != nil {
 		logrus.Info(err)
 		return err
+	}
+	if !user.ValidatePassword([]byte(passwordHash)) {
+		return errors.New("Invalid password")
 	}
 	return nil
 }
