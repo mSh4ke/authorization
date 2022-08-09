@@ -14,17 +14,20 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 	return func(writer http.ResponseWriter, req *http.Request) {
 		initHeaders(writer, req)
 		var perm models.Permission
-		perm.Name = mux.Vars(req)["endpoint"]
+		perm.Path = mux.Vars(req)["endpoint"]
+		perm.Method = method
 		reqToken := req.Header.Get(HeaderString)
 		fmt.Println(reqToken)
-
+		if reqToken == "" && api.Config.UnauthorizedId != 0 {
+			return
+		}
 		if err := api.ValidateToken(reqToken, &perm); err != nil {
 			api.logger.Info("error validating token: ", err)
 			http.Error(writer, "access denied", 403)
 			return
 		}
 
-		request, err := http.NewRequest(method, perm.ConstructUrl(api), req.Body)
+		request, err := http.NewRequest(perm.Method, perm.ConstructUrl(api), req.Body)
 		if err != nil {
 			fmt.Println("error creating request: ", err)
 			http.Error(writer, "internal error", 500)

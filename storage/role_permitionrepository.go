@@ -11,15 +11,15 @@ type RolePermRep struct {
 }
 
 const usersTable = "users"
-const rolePermTable = "roles_permisions"
-const permTable = "permisions"
+const rolePermTable = "roles_permissions"
+const permTable = "permissions"
 
-func (rolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permission) error {
+func (RolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permission) error {
 	query := fmt.Sprintf("SELECT p.server_id FROM %s AS rp ", rolePermTable) +
 		fmt.Sprintf("INNER JOIN %s AS u on u.role_id = rp.roles_id ", usersTable) +
-		fmt.Sprintf("INNER JOIN %s AS p on p.name = rp.permisions_id ", permTable) +
-		fmt.Sprintf("WHERE u.id = $1 and permString = $2)")
-	if err := rolePermRep.storage.db.QueryRow(query, userId, perm.Name).Scan(&perm.ServerId); err != nil {
+		fmt.Sprintf("INNER JOIN %s AS p on p.id = rp.permisions_id ", permTable) +
+		fmt.Sprintf("WHERE u.id = $1 AND p.req_path = $2 AND p.req_method = $3")
+	if err := RolePermRep.storage.db.QueryRow(query, userId, perm.Path, perm.Method).Scan(&perm.ServerId); err != nil {
 		fmt.Println(err)
 		return err
 	}
@@ -27,7 +27,7 @@ func (rolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permiss
 }
 
 func (RolePermRep *RolePermRep) AddPermission(roleId int, permId int) error {
-	query := fmt.Sprintf("INSERT INTO %s (roles_id,permisions_id) VALUES ($1,$2)", rolePermTable)
+	query := fmt.Sprintf("INSERT INTO %s (roles_id,permissions_id) VALUES ($1,$2)", rolePermTable)
 	if _, err := RolePermRep.storage.db.Query(query, roleId, permId); err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (RolePermRep *RolePermRep) AddPermission(roleId int, permId int) error {
 }
 
 func (RolePermRep *RolePermRep) RemovePermission(roleId int, permId int) error {
-	query := fmt.Sprintf("DELETE FROM %s (roles_id,permisions_id) VALUES ($1,$2)", rolePermTable)
+	query := fmt.Sprintf("DELETE FROM %s (roles_id,permissions_id) VALUES ($1,$2)", rolePermTable)
 	if _, err := RolePermRep.storage.db.Query(query, roleId, permId); err != nil {
 		return err
 	}
@@ -43,8 +43,8 @@ func (RolePermRep *RolePermRep) RemovePermission(roleId int, permId int) error {
 }
 
 func (RolePermRep *RolePermRep) ListRolePerms(roleId int) (*[]models.Permission, error) {
-	query := fmt.Sprintf("SELECT p.id,p.name FROM %s AS rp ", rolePermTable) +
-		fmt.Sprintf("LEFT JOIN %s AS p ON rp.perm_id = p.id ") +
+	query := fmt.Sprintf("SELECT p.id,p. FROM %s AS rp ", rolePermTable) +
+		fmt.Sprintf("LEFT JOIN %s AS p ON rp.perm_id = p.id ", permTable) +
 		fmt.Sprintf("WHERE rp.role_id = %d", roleId)
 	fmt.Println(query)
 	rows, err := RolePermRep.storage.db.Query(query)
@@ -53,10 +53,10 @@ func (RolePermRep *RolePermRep) ListRolePerms(roleId int) (*[]models.Permission,
 		return nil, err
 	}
 	defer rows.Close()
-	perms := make([]models.Permission, 10)
+	perms := make([]models.Permission, 0)
 	for rows.Next() {
 		var perm models.Permission
-		if err := rows.Scan(&perm.Id, &perm.Name); err != nil {
+		if err := rows.Scan(&perm.Id, &perm.Path, &perm.Method, &perm.ServerId); err != nil {
 			log.Println(err)
 			continue
 		}

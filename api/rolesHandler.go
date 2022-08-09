@@ -12,10 +12,14 @@ import (
 
 func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	PermString := "/admin/createRole"
+	perm := models.Permission{
+		Path:     "/admin/createRole",
+		Method:   "POST",
+		ServerId: 0,
+	}
 	reqToken := req.Header.Get(HeaderString)
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, PermString); err != nil {
+	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", 403)
 		return
@@ -44,10 +48,14 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 
 func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	PermString := "/admin/assignRole"
+	perm := models.Permission{
+		Path:     "/admin/assignRole",
+		Method:   "Post",
+		ServerId: 0,
+	}
 	reqToken := req.Header.Get(HeaderString)
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, PermString); err != nil {
+	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", 403)
 		return
@@ -76,10 +84,14 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 
 func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	PermString := "/admin/addPerm"
+	perm := models.Permission{
+		Path:     "/admin/addPerm",
+		Method:   "Post",
+		ServerId: 0,
+	}
 	reqToken := req.Header.Get(HeaderString)
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, PermString); err != nil {
+	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", 403)
 		return
@@ -112,10 +124,14 @@ func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
 
 func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	PermString := "/admin/removePerm"
+	perm := models.Permission{
+		Path:     "/admin/removePerm",
+		Method:   "Delete",
+		ServerId: 0,
+	}
 	reqToken := req.Header.Get(HeaderString)
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, PermString); err != nil {
+	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", 403)
 		return
@@ -148,10 +164,14 @@ func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
 
 func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	PermString := "/admin/listRoles"
+	perm := models.Permission{
+		Path:     "/admin/listRoles",
+		Method:   "Get",
+		ServerId: 0,
+	}
 	reqToken := req.Header.Get(HeaderString)
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, PermString); err != nil {
+	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", 403)
 		return
@@ -170,10 +190,15 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 
 func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 	initHeaders(wrt, req)
-	PermString := "/admin/listRolePerms"
+	perm := models.Permission{
+		Path:     "/admin/listRolePerms",
+		Method:   "Get",
+		ServerId: 0,
+	}
+
 	reqToken := req.Header.Get(HeaderString)
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, PermString); err != nil {
+	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", 403)
 		return

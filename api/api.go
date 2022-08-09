@@ -35,6 +35,9 @@ func (api *API) Start() error {
 	if err := api.configreStorageField(); err != nil {
 		return err
 	}
+	if err := api.storage.UserRepository.InitAdmin(); err != nil {
+		return err
+	}
 	return http.ListenAndServe(api.Config.BindAddr, api.router)
 }
 
