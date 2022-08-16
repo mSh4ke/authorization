@@ -26,8 +26,8 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			http.Error(writer, "access denied", 403)
 			return
 		}
-
-		request, err := http.NewRequest(perm.Method, perm.ConstructUrl(api), req.Body)
+		servers := *api.Config.Servers
+		request, err := http.NewRequest(perm.Method, perm.ConstructUrl(servers[perm.ServerId]), req.Body)
 		if err != nil {
 			fmt.Println("error creating request: ", err)
 			http.Error(writer, "internal error", 500)

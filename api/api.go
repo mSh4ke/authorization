@@ -25,13 +25,13 @@ func New(config *Config) *API {
 }
 
 func (api *API) Start() error {
-	if err := api.configreLoggerField(); err != nil {
+	if err := api.configureLoggerField(); err != nil {
 		return err
 	}
 	api.logger.Info("starting api server at port:", api.Config.BindAddr)
 	api.logger.Info("Default user role id: ", api.Config.DefaultRoleId)
 	api.logger.Info("Secret key: ", api.Config.SecretKey)
-	api.configreRouterField()
+	api.configureRouterField()
 	if err := api.configreStorageField(); err != nil {
 		return err
 	}

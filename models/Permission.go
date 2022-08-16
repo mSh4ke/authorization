@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/mSh4ke/authorization/api"
 	"regexp"
 	"strings"
 )
@@ -14,9 +13,8 @@ type Permission struct {
 	ServerId int    `json:"server_id"`
 }
 
-func (perm *Permission) ConstructUrl(api *api.API) string {
-	servers := *api.Config.Servers
-	return servers[perm.ServerId] + perm.Path
+func (perm *Permission) ConstructUrl(server string) string {
+	return server + perm.Path
 }
 
 func (perm *Permission) ParseUrl() string {

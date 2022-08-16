@@ -10,7 +10,7 @@ var (
 	prefix = "/api/v2"
 )
 
-func (a *API) configreLoggerField() error {
+func (a *API) configureLoggerField() error {
 
 	log_level, err := logrus.ParseLevel(a.Config.LoggerLevel)
 	if err != nil {
@@ -19,7 +19,7 @@ func (a *API) configreLoggerField() error {
 	a.logger.SetLevel(log_level)
 	return nil
 }
-func (a *API) configreRouterField() {
+func (a *API) configureRouterField() {
 	//users handlers
 	a.router.HandleFunc(prefix+"/users/register", a.RegisterUser).Methods("POST")
 	a.router.HandleFunc(prefix+"/users/auth", a.Authenticate).Methods("POST")
