@@ -5,7 +5,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mSh4ke/authorization/models"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strings"
 )
 
 const HeaderString = "Bearer"
@@ -19,7 +21,15 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
 		perm.Method = method
-		reqToken := req.Header.Get(HeaderString)
+
+		reqToken := req.Header.Get("Authorization")
+		splitToken := strings.Split(reqToken, "Bearer")
+		if len(splitToken) != 2 {
+			log.Println("invalid token")
+		}
+
+		reqToken = strings.TrimSpace(splitToken[1])
+
 		fmt.Println(reqToken)
 		if reqToken == "" && api.Config.UnauthorizedId != 0 {
 			return
