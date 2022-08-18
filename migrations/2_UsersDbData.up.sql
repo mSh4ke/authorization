@@ -56,7 +56,7 @@ INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/document
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/documents/unhold/param','PUT',1);
 
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/compwarh/param','POST',1);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/compwarh/param','POST',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/compwarh/param','DELETE',1);
 
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/images','GET',2);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/images','POST',2);

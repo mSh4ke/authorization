@@ -14,7 +14,10 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 	return func(writer http.ResponseWriter, req *http.Request) {
 		initHeaders(writer, req)
 		var perm models.Permission
-		perm.Path = mux.Vars(req)["endpoint"]
+		perm.Path = "/" + mux.Vars(req)["endpoint"]
+		if mux.Vars(req)["param"] != "" {
+			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
+		}
 		perm.Method = method
 		reqToken := req.Header.Get(HeaderString)
 		fmt.Println(reqToken)

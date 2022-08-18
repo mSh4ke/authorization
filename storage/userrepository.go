@@ -83,7 +83,8 @@ func (userRep *Userrepository) InitAdmin() error {
 	}
 	if userNum == 0 {
 		fmt.Println("Empty user base, creating admin account")
-		var admin models.User
+		adminRole := models.Role{Id: 1}
+		admin := models.User{Role: &adminRole}
 		fmt.Println("Please input admin login")
 		fmt.Scanln(&admin.Login)
 		fmt.Println("Please input admin password")
