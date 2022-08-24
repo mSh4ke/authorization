@@ -49,5 +49,5 @@ type Message struct {
 
 func initHeaders(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", HeaderString)
+	req.Header.Set("Authorization", "Bearer ")
 }

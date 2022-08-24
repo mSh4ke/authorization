@@ -15,9 +15,9 @@ const rolePermTable = "roles_permissions"
 const permTable = "permissions"
 
 func (RolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permission) error {
-	query := fmt.Sprintf("SELECT p.server_id FROM %s AS rp ", rolePermTable) +
+	query := fmt.Sprintf("SELECT p.req_server_id FROM %s AS rp ", rolePermTable) +
 		fmt.Sprintf("INNER JOIN %s AS u on u.role_id = rp.roles_id ", usersTable) +
-		fmt.Sprintf("INNER JOIN %s AS p on p.id = rp.permisions_id ", permTable) +
+		fmt.Sprintf("INNER JOIN %s AS p on p.id = rp.permissions_id ", permTable) +
 		fmt.Sprintf("WHERE u.id = $1 AND p.req_path = $2 AND p.req_method = $3")
 	if err := RolePermRep.storage.db.QueryRow(query, userId, perm.Path, perm.Method).Scan(&perm.ServerId); err != nil {
 		fmt.Println(err)

@@ -17,23 +17,23 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 		Method:   "POST",
 		ServerId: 0,
 	}
-	reqToken := req.Header.Get(HeaderString)
+	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
 	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
-		http.Error(wrt, "access denied", 403)
+		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
 	var role models.Role
 	if err := json.NewDecoder(req.Body).Decode(&role); err != nil {
 		log.Println("cannot decode body json: ", err)
-		http.Error(wrt, "invalid body json", 400)
+		http.Error(wrt, "invalid body json", http.StatusBadRequest)
 		return
 	}
 
 	if err := api.storage.RoleRep.Create(&role); err != nil {
 		log.Println("failed creating role: ", err)
-		http.Error(wrt, "internal error", 500)
+		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
 	msg := Message{
@@ -53,17 +53,17 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 		Method:   "Post",
 		ServerId: 0,
 	}
-	reqToken := req.Header.Get(HeaderString)
+	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
 	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
-		http.Error(wrt, "access denied", 403)
+		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
 	var role models.Role
 	if err := json.NewDecoder(req.Body).Decode(&role); err != nil {
 		log.Println("cannot decode body json: ", err)
-		http.Error(wrt, "invalid body json", 400)
+		http.Error(wrt, "invalid body json", http.StatusBadRequest)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
 		Method:   "Post",
 		ServerId: 0,
 	}
-	reqToken := req.Header.Get(HeaderString)
+	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
 	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
@@ -129,7 +129,7 @@ func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
 		Method:   "Delete",
 		ServerId: 0,
 	}
-	reqToken := req.Header.Get(HeaderString)
+	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
 	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
@@ -169,7 +169,7 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 		Method:   "Get",
 		ServerId: 0,
 	}
-	reqToken := req.Header.Get(HeaderString)
+	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
 	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)
@@ -196,7 +196,7 @@ func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 
-	reqToken := req.Header.Get(HeaderString)
+	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
 	if err := api.ValidateToken(reqToken, &perm); err != nil {
 		api.logger.Info(err)

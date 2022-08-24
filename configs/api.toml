@@ -3,7 +3,7 @@ logger_level = "debug"
 secret_key = "your_mom"
 default_role_id = 2
 unauthorized_id = 0
-servers = ["localhost:8000/api/v3","localhost:8080/api/v3"]
+servers = ["http://127.0.0.1:8000/api/v3","http://127.0.0.1:8080/api/v3"]
 
 [storage]
 database_uri = "host=localhost port=5432 user=postgres password=lthgfhjkm dbname=Users sslmode=disable"

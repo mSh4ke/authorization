@@ -10,22 +10,24 @@ import (
 	"strings"
 )
 
-const HeaderString = "Bearer"
-
 func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req *http.Request) {
 	return func(writer http.ResponseWriter, req *http.Request) {
-		initHeaders(writer, req)
+		fmt.Println("accesing data")
 		var perm models.Permission
 		perm.Path = "/" + mux.Vars(req)["endpoint"]
 		if mux.Vars(req)["param"] != "" {
 			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
 		perm.Method = method
-
+		fmt.Println(req.Header)
+		fmt.Println("decoding token")
 		reqToken := req.Header.Get("Authorization")
-		splitToken := strings.Split(reqToken, "Bearer")
+		splitToken := strings.Split(reqToken, "Bearer ")
 		if len(splitToken) != 2 {
 			log.Println("invalid token")
+			log.Println(reqToken)
+			http.Error(writer, "invalid token", http.StatusForbidden)
+			return
 		}
 
 		reqToken = strings.TrimSpace(splitToken[1])
@@ -36,14 +38,15 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		}
 		if err := api.ValidateToken(reqToken, &perm); err != nil {
 			api.logger.Info("error validating token: ", err)
-			http.Error(writer, "access denied", 403)
+			http.Error(writer, "access denied", http.StatusForbidden)
 			return
 		}
 		servers := *api.Config.Servers
+		fmt.Sprintf("%s %s", perm.Method, perm.ConstructUrl(servers[perm.ServerId]))
 		request, err := http.NewRequest(perm.Method, perm.ConstructUrl(servers[perm.ServerId]), req.Body)
 		if err != nil {
 			fmt.Println("error creating request: ", err)
-			http.Error(writer, "internal error", 500)
+			http.Error(writer, "internal error", http.StatusInternalServerError)
 			return
 		}
 
@@ -51,17 +54,17 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		response, err := client.Do(request)
 		if err != nil {
 			fmt.Println("error sending request: ", err)
-			http.Error(writer, "internal error", 500)
+			http.Error(writer, "internal error", http.StatusInternalServerError)
 			return
 		}
 		defer response.Body.Close()
 		responseData, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println("error reading response data: ", err)
-			http.Error(writer, "internal error", 500)
+			http.Error(writer, "internal error", http.StatusInternalServerError)
 			return
 		}
-		writer.WriteHeader(200)
+		writer.WriteHeader(http.StatusOK)
 		writer.Write(responseData)
 	}
 }
