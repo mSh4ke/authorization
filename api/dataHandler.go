@@ -19,7 +19,6 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
 		perm.Method = method
-		fmt.Println(req.Header)
 		fmt.Println("decoding token")
 		reqToken := req.Header.Get("Authorization")
 		splitToken := strings.Split(reqToken, "Bearer ")
@@ -32,7 +31,6 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 
 		reqToken = strings.TrimSpace(splitToken[1])
 
-		fmt.Println(reqToken)
 		if reqToken == "" && api.Config.UnauthorizedId != 0 {
 			return
 		}
@@ -42,6 +40,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			return
 		}
 		servers := *api.Config.Servers
+		fmt.Println(perm.ConstructUrl(servers[perm.ServerId]))
 		fmt.Sprintf("%s %s", perm.Method, perm.ConstructUrl(servers[perm.ServerId]))
 		request, err := http.NewRequest(perm.Method, perm.ConstructUrl(servers[perm.ServerId]), req.Body)
 		if err != nil {
@@ -49,7 +48,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			http.Error(writer, "internal error", http.StatusInternalServerError)
 			return
 		}
-
+		fmt.Println("sending request")
 		client := &http.Client{}
 		response, err := client.Do(request)
 		if err != nil {
@@ -58,13 +57,15 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			return
 		}
 		defer response.Body.Close()
+		fmt.Println("reading data")
 		responseData, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println("error reading response data: ", err)
 			http.Error(writer, "internal error", http.StatusInternalServerError)
 			return
 		}
-		writer.WriteHeader(http.StatusOK)
+		fmt.Println("writing response")
 		writer.Write(responseData)
+		writer.WriteHeader(http.StatusOK)
 	}
 }
