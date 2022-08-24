@@ -65,7 +65,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			return
 		}
 		fmt.Println("writing response")
-		writer.Write(responseData)
 		writer.WriteHeader(http.StatusOK)
+		writer.Write(responseData)
 	}
 }
