@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -17,11 +16,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		var perm models.Permission
 		perm.Path = "/" + mux.Vars(req)["endpoint"]
 		if mux.Vars(req)["param"] != "" {
-			if _, err := strconv.Atoi(mux.Vars(req)["param"]); err == nil {
-				perm.Path = perm.Path + "/" + "param"
-			} else {
-				perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
-			}
+			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
 		perm.Method = method
 		fmt.Println("decoding token")
