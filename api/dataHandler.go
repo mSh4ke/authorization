@@ -15,7 +15,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		fmt.Println("accesing data")
 		var perm models.Permission
 		perm.Path = "/" + mux.Vars(req)["endpoint"]
-		if mux.Vars(req)["param"] != "" {
+		if mux.Vars(req)["param"] != "post" {
 			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
 		perm.Method = method
