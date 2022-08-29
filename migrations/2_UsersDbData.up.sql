@@ -23,11 +23,11 @@ INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehous
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouses/param','GET',1);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouses/param','POST',1);
 
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehousesCells','POST',1);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehousesCells/list','POST',1);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehousesCells/param','DELETE',1);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehousesCells/param','PUT',1);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehousesCells/param','GET',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouseCells','POST',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouseCells/list','POST',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouseCells/param','DELETE',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouseCells/param','PUT',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/warehouseCells/param','GET',1);
 
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/gtd','POST',1);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/gtd/list','POST',1);

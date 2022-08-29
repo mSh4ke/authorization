@@ -46,8 +46,3 @@ type Message struct {
 	Message    string `json:"message"`
 	IsError    bool   `json:"is_error"`
 }
-
-func initHeaders(writer http.ResponseWriter, req *http.Request) {
-	writer.Header().Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer ")
-}

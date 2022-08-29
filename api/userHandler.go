@@ -8,7 +8,6 @@ import (
 )
 
 func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	role := models.Role{}
 	user := models.User{
 		Role: &role,
@@ -50,7 +49,6 @@ func (api *API) Authenticate(wrt http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) RegisterUser(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 
 	role := models.Role{}
 	user := models.User{

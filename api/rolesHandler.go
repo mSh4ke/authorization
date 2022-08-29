@@ -11,7 +11,6 @@ import (
 )
 
 func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	perm := models.Permission{
 		Path:     "/admin/createRole",
 		Method:   "POST",
@@ -47,7 +46,6 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	perm := models.Permission{
 		Path:     "/admin/assignRole",
 		Method:   "Post",
@@ -83,7 +81,6 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	perm := models.Permission{
 		Path:     "/admin/addPerm",
 		Method:   "Post",
@@ -123,7 +120,6 @@ func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	perm := models.Permission{
 		Path:     "/admin/removePerm",
 		Method:   "Delete",
@@ -163,7 +159,6 @@ func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	perm := models.Permission{
 		Path:     "/admin/listRoles",
 		Method:   "Get",
@@ -189,7 +184,6 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 }
 
 func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
-	initHeaders(wrt, req)
 	perm := models.Permission{
 		Path:     "/admin/listRolePerms",
 		Method:   "Get",
