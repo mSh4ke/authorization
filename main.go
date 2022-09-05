@@ -22,7 +22,7 @@ func main() {
 
 	//В этот момент происходит инициализация переменной configPath значением
 	flag.Parse()
-	log.Println("It works")
+	log.Println("starting server")
 	//server instance initialization
 	config := api.NewConfig()
 	log.Println("config path: ", configPath)
@@ -32,6 +32,7 @@ func main() {
 	}
 
 	server := api.New(config)
+	defer server.ShutDown()
 	if err := server.Start(); err != nil {
 		log.Fatal(err)
 	}

@@ -32,13 +32,18 @@ func (api *API) Start() error {
 	api.logger.Info("Default user role id: ", api.Config.DefaultRoleId)
 	api.logger.Info("Secret key: ", api.Config.SecretKey)
 	api.configureRouterField()
-	if err := api.configreStorageField(); err != nil {
+	if err := api.configureStorageField(); err != nil {
 		return err
 	}
 	if err := api.storage.UserRepository.InitAdmin(); err != nil {
 		return err
 	}
 	return http.ListenAndServe(api.Config.BindAddr, api.router)
+}
+
+func (api *API) ShutDown() {
+	api.storage.Close()
+	return
 }
 
 type Message struct {

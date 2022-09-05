@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/mSh4ke/authorization/models"
@@ -72,6 +73,49 @@ func (userRep *Userrepository) EditProfile(userprf models.UserProfile, userId in
 		return err
 	}
 	return nil
+}
+
+func (userRep *Userrepository) List(roleid int) (*[]models.User, error) {
+	var (
+		rows *sql.Rows
+		err  error
+	)
+	if roleid == 0 {
+		rows, err = userRep.storage.db.Query("SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id ")
+	} else {
+		rows, err = userRep.storage.db.Query(fmt.Sprintf("SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id WHERE u.role_id = %d", roleid))
+	}
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+	users := make([]models.User, 0)
+	for rows.Next() {
+		role := models.Role{}
+		user := models.User{Role: &role}
+		if err = rows.Scan(&user.Id, &user.Profile.DisplayName, &role.Id, &role.Name); err != nil {
+			log.Println(err)
+			continue
+		}
+		users = append(users, user)
+	}
+	return &users, nil
+}
+
+const userGetReq = "SELECT u.role_id,u.display_name,u.contact_info,r.name FROM users AS u LEFT JOIN roles AS r on r.id = u.role_id WHERE u.id = $1"
+
+func (userRep *Userrepository) Get(id int) (*models.User, error) {
+	role := models.Role{}
+	user := models.User{
+		Id:   id,
+		Role: &role,
+	}
+	if err := userRep.storage.db.QueryRow(userGetReq).Scan(&role.Id, &user.Profile.DisplayName, &user.Profile.ContactInfo, &role.Name); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (userRep *Userrepository) InitAdmin() error {

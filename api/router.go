@@ -23,7 +23,8 @@ func (a *API) configureRouterField() {
 	//users handlers
 	a.router.HandleFunc(prefix+"/users/register", a.RegisterUser).Methods("POST")
 	a.router.HandleFunc(prefix+"/users/auth", a.Authenticate).Methods("POST")
-	a.router.HandleFunc(prefix+"/users/test", a.Authenticate).Methods("GET")
+	a.router.HandleFunc(prefix+"/users/list", a.ListUsers).Methods("POST")
+	a.router.HandleFunc(prefix+"/users/{id}", a.GetUser).Methods("GET")
 
 	//admin
 	a.router.HandleFunc(prefix+"/admin/createRole", a.CreateRole).Methods("POST")
@@ -39,7 +40,7 @@ func (a *API) configureRouterField() {
 	a.router.HandleFunc(prefix+"/data/{endpoint}/{param}", a.RouteHandler("PUT")).Methods("PUT")
 	a.router.HandleFunc(prefix+"/data/{endpoint}/{param}", a.RouteHandler("DELETE")).Methods("DELETE")
 }
-func (a *API) configreStorageField() error {
+func (a *API) configureStorageField() error {
 	storage := storage.New(a.Config.Storage)
 
 	if err := storage.Open(); err != nil {
