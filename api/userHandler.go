@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mSh4ke/authorization/models"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -127,7 +128,21 @@ func (api *API) ListUsers(wrt http.ResponseWriter, req *http.Request) {
 		log.Println(err)
 		http.Error(wrt, "internal error", http.StatusInternalServerError)
 	}
-	json.NewEncoder(wrt).Encode(users)
+	Resp := struct {
+		PgNum    int `json:"pg_number"`
+		PgLen    int `json:"pg_length"`
+		TotalRec int `json:"total_rec"`
+		TotalPg  int `json:"total_pg"`
+		List     *[]models.User
+	}{
+		PgNum:    pgReq.PageNumber,
+		PgLen:    pgReq.PageLength,
+		TotalRec: pgReq.TotalRecords,
+		TotalPg:  0,
+		List:     users,
+	}
+	Resp.TotalPg = int(math.Ceil(float64(Resp.TotalRec) / float64(Resp.PgLen)))
+	json.NewEncoder(wrt).Encode(&Resp)
 	wrt.WriteHeader(http.StatusOK)
 }
 
