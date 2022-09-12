@@ -114,7 +114,8 @@ func (api *API) ListUsers(wrt http.ResponseWriter, req *http.Request) {
 		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
-	pgReq := models.PageRequest{}
+	fields := make([]models.Field, 0)
+	pgReq := models.PageRequest{Fields: &fields}
 	err := json.NewDecoder(req.Body).Decode(&pgReq)
 	if err != nil {
 		http.Error(wrt, "invalid json", 400)
