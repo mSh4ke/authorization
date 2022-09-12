@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/mSh4ke/authorization/models"
@@ -75,16 +74,9 @@ func (userRep *Userrepository) EditProfile(userprf models.UserProfile, userId in
 	return nil
 }
 
-func (userRep *Userrepository) List(roleid int) (*[]models.User, error) {
-	var (
-		rows *sql.Rows
-		err  error
-	)
-	if roleid == 0 {
-		rows, err = userRep.storage.db.Query("SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id ")
-	} else {
-		rows, err = userRep.storage.db.Query(fmt.Sprintf("SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id WHERE u.role_id = %d", roleid))
-	}
+func (userRep *Userrepository) List(pgReq *models.PageRequest) (*[]models.User, error) {
+	query := ("SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id" + pgReq.PageReq())
+	rows, err := userRep.storage.db.Query(query)
 	if err != nil {
 		log.Println(err)
 		return nil, err

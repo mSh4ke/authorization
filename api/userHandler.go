@@ -89,16 +89,11 @@ func (api *API) RegisterUser(wrt http.ResponseWriter, req *http.Request) {
 func (api *API) ListUsers(wrt http.ResponseWriter, req *http.Request) {
 	fmt.Println("accesing usersList")
 	perm := models.Permission{
-		Path:     "users/list",
+		Path:     "/users/list",
 		Method:   "POST",
 		ServerId: 0,
 	}
-	var roleid int
-	if rid, err := strconv.Atoi(mux.Vars(req)["roleid"]); err != nil {
-		roleid = 0
-	} else {
-		roleid = rid
-	}
+
 	fmt.Println("decoding token")
 	reqToken := req.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
@@ -119,7 +114,13 @@ func (api *API) ListUsers(wrt http.ResponseWriter, req *http.Request) {
 		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
-	users, err := api.storage.UserRepository.List(roleid)
+	pgReq := models.PageRequest{}
+	err := json.NewDecoder(req.Body).Decode(&pgReq)
+	if err != nil {
+		http.Error(wrt, "invalid json", 400)
+		return
+	}
+	users, err := api.storage.UserRepository.List(&pgReq)
 	if err != nil {
 		log.Println("failed fetching user list")
 		log.Println(err)
