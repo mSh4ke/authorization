@@ -103,7 +103,7 @@ func (userRep *Userrepository) Get(id int) (*models.User, error) {
 		Id:   id,
 		Role: &role,
 	}
-	if err := userRep.storage.db.QueryRow(userGetReq).Scan(&role.Id, &user.Profile.DisplayName, &user.Profile.ContactInfo, &role.Name); err != nil {
+	if err := userRep.storage.db.QueryRow(userGetReq, id).Scan(&role.Id, &user.Profile.DisplayName, &user.Profile.ContactInfo, &role.Name); err != nil {
 		log.Println(err)
 		return nil, err
 	}

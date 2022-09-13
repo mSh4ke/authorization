@@ -160,7 +160,7 @@ func (api *API) ListUsers(wrt http.ResponseWriter, req *http.Request) {
 func (api *API) GetUser(wrt http.ResponseWriter, req *http.Request) {
 	fmt.Println("accesing user data")
 	perm := models.Permission{
-		Path:     "users/list",
+		Path:     "/users/list",
 		Method:   "POST",
 		ServerId: 0,
 	}
