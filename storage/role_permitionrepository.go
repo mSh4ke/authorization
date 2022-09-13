@@ -36,18 +36,10 @@ func (RolePermRep *RolePermRep) AddPermission(tx *sql.Tx, ctx *context.Context, 
 	return nil
 }
 
-func (RolePermRep *RolePermRep) RemovePermission(roleId int, permId int) error {
-	query := fmt.Sprintf("DELETE FROM %s (roles_id,permissions_id) VALUES ($1,$2)", rolePermTable)
-	if _, err := RolePermRep.storage.db.Query(query, roleId, permId); err != nil {
-		return err
-	}
-	return nil
-}
-
 const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id WHERE rp.roles_id = $1"
 
 func (RolePermRep *RolePermRep) ListRolePerms(roleId int) (*[]models.Permission, error) {
-	rows, err := RolePermRep.storage.db.Query(ListRolePerms)
+	rows, err := RolePermRep.storage.db.Query(ListRolePerms, roleId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,10 +56,16 @@ func (RolePermRep *RolePermRep) ListRolePerms(roleId int) (*[]models.Permission,
 	return &perms, nil
 }
 
+const ClearRolePerms = "DELETE FROM roles_permissions WHERE roles_id = $1"
+
 func (RolePermRep *RolePermRep) AssignPermissions(roleId int, permsId *[]int) error {
 	ctx := context.Background()
 	tx, err := RolePermRep.storage.db.BeginTx(ctx, nil)
 	if err != nil {
+		return err
+	}
+	if _, err = tx.QueryContext(ctx, ClearRolePerms, roleId); err != nil {
+		tx.Rollback()
 		return err
 	}
 	for permId := range *permsId {
