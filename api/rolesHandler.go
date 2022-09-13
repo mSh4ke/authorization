@@ -18,10 +18,16 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 	}
 	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
+		api.logger.Info(err)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
+		return
+	}
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, "access denied", http.StatusForbidden)
-		return
 	}
 	var role models.Role
 	if err := json.NewDecoder(req.Body).Decode(&role); err != nil {
@@ -40,7 +46,7 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 		Message:    "success",
 		IsError:    false,
 	}
-	wrt.WriteHeader(200)
+	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(msg)
 	return
 }
@@ -52,22 +58,30 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
-	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
 		api.logger.Info(err)
-		http.Error(wrt, "access denied", http.StatusForbidden)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
 		return
 	}
-	var role models.Role
-	if err := json.NewDecoder(req.Body).Decode(&role); err != nil {
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
+		api.logger.Info(err)
+		http.Error(wrt, "access denied", http.StatusForbidden)
+	}
+	var userRole struct {
+		RoleId int `json:"role_id"`
+		UserId int `json:"user_id"`
+	}
+	if err := json.NewDecoder(req.Body).Decode(&userRole); err != nil {
 		log.Println("cannot decode body json: ", err)
 		http.Error(wrt, "invalid body json", http.StatusBadRequest)
 		return
 	}
 
-	if err := api.storage.RoleRep.Create(&role); err != nil {
+	if err := api.storage.UserRepository.AssignRole(userRole.UserId, userRole.RoleId); err != nil {
 		log.Println("failed creating role: ", err)
-		http.Error(wrt, "internal error", 500)
+		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
 	msg := Message{
@@ -75,7 +89,7 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 		Message:    "success",
 		IsError:    false,
 	}
-	wrt.WriteHeader(200)
+	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(msg)
 	return
 }
@@ -88,25 +102,32 @@ func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
 	}
 	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
 		api.logger.Info(err)
-		http.Error(wrt, "access denied", 403)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
 		return
 	}
-	var rolePerm struct {
-		roleId int `json:"role_id"`
-		permId int `json:"perm_id"`
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
+		api.logger.Info(err)
+		http.Error(wrt, "access denied", http.StatusForbidden)
 	}
+	var rolePerm struct {
+		RoleId  int   `json:"role_id"`
+		PermIds []int `json:"perm_id"`
+	}
+	rolePerm.PermIds = make([]int, 0)
 
 	if err := json.NewDecoder(req.Body).Decode(&rolePerm); err != nil {
 		log.Println("cannot decode body json: ", err)
-		http.Error(wrt, "invalid body json", 400)
+		http.Error(wrt, "invalid body json", http.StatusBadRequest)
 		return
 	}
 
-	if err := api.storage.RolePermRep.AddPermission(rolePerm.roleId, rolePerm.permId); err != nil {
-		log.Println("failed creating role: ", err)
-		http.Error(wrt, "internal error", 500)
+	if err := api.storage.RolePermRep.AssignPermissions(rolePerm.RoleId, &rolePerm.PermIds); err != nil {
+		log.Println("failed adding permissions: ", err)
+		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
 	msg := Message{
@@ -114,7 +135,7 @@ func (api *API) addPerm(wrt http.ResponseWriter, req *http.Request) {
 		Message:    "success",
 		IsError:    false,
 	}
-	wrt.WriteHeader(200)
+	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(msg)
 	return
 }
@@ -126,15 +147,21 @@ func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
-	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
-		api.logger.Info(err)
-		http.Error(wrt, "access denied", 403)
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
+		api.logger.Info("error validating token: ", err)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
+		return
+	}
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
+		api.logger.Info("error getting permission", err)
+		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
 	var rolePerm struct {
-		roleId int `json:"role_id"`
-		permId int `json:"perm_id"`
+		RoleId int `json:"role_id"`
+		PermId int `json:"perm_id"`
 	}
 
 	if err := json.NewDecoder(req.Body).Decode(&rolePerm); err != nil {
@@ -143,7 +170,7 @@ func (api *API) removePerm(wrt http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err := api.storage.RolePermRep.RemovePermission(rolePerm.roleId, rolePerm.permId); err != nil {
+	if err := api.storage.RolePermRep.RemovePermission(rolePerm.RoleId, rolePerm.PermId); err != nil {
 		log.Println("failed creating role: ", err)
 		http.Error(wrt, "internal error", 500)
 		return
@@ -165,10 +192,16 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
-	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
-		api.logger.Info(err)
-		http.Error(wrt, "access denied", 403)
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
+		api.logger.Info("error validating token: ", err)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
+		return
+	}
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
+		api.logger.Info("error getting permission", err)
+		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
 
@@ -192,24 +225,30 @@ func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 
 	reqToken := req.Header.Get("Authorization")
 	fmt.Println(reqToken)
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
 		api.logger.Info(err)
-		http.Error(wrt, "access denied", 403)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
 		return
+	}
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
+		api.logger.Info(err)
+		http.Error(wrt, "access denied", http.StatusForbidden)
 	}
 	roleid, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
-		http.Error(wrt, "malformed id", 400)
+		http.Error(wrt, "malformed id", http.StatusBadRequest)
 		return
 	}
 
 	roles, err := api.storage.RolePermRep.ListRolePerms(roleid)
 	if err != nil {
 		log.Println("failed creating role: ", err)
-		http.Error(wrt, "internal error", 500)
+		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
-	wrt.WriteHeader(200)
+	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(roles)
 	return
 }

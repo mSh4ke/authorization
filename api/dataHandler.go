@@ -33,7 +33,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		if reqToken == "" && api.Config.UnauthorizedId != 0 {
 			return
 		}
-		userId, err := api.ValidateToken(reqToken, &perm)
+		userId, err := api.ValidateToken(reqToken)
 		if err != nil {
 			api.logger.Info("error validating token: ", err)
 			http.Error(writer, err.Error(), http.StatusForbidden)
