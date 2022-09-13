@@ -25,7 +25,7 @@ func (api *API) GenerateJWT(userId int) (tokenString string, err error) {
 	return
 }
 
-func (api *API) ValidateToken(signedToken string, perm *models.Permission) error {
+func (api *API) ValidateToken(signedToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
@@ -34,19 +34,22 @@ func (api *API) ValidateToken(signedToken string, perm *models.Permission) error
 		},
 	)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	claims, ok := token.Claims.(*JWTClaim)
 	if !ok {
-		err = errors.New("couldn't parse claims")
-		return err
+		err = errors.New("bad token")
+		return 0, err
 	}
 	if claims.ExpiresAt < time.Now().Local().Unix() {
 		err = errors.New("token expired")
-		return err
+		return 0, err
 	}
-	err = api.storage.RolePermRep.CheckPermission(claims.UserId, perm)
-	if err != nil {
+	return claims.UserId, nil
+}
+
+func (api *API) ValidatePermission(userId int, perm *models.Permission) error {
+	if err := api.storage.RolePermRep.CheckPermission(userId, perm); err != nil {
 		return err
 	}
 	return nil

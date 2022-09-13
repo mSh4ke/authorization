@@ -12,14 +12,13 @@ import (
 
 func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req *http.Request) {
 	return func(writer http.ResponseWriter, req *http.Request) {
-		fmt.Println("accesing data")
 		var perm models.Permission
+
 		perm.Path = "/" + mux.Vars(req)["endpoint"]
 		if mux.Vars(req)["param"] != "post" {
 			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
 		perm.Method = method
-		fmt.Println("decoding token")
 		reqToken := req.Header.Get("Authorization")
 		splitToken := strings.Split(reqToken, "Bearer ")
 		if len(splitToken) != 2 {
@@ -34,21 +33,27 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 		if reqToken == "" && api.Config.UnauthorizedId != 0 {
 			return
 		}
-		if err := api.ValidateToken(reqToken, &perm); err != nil {
+		userId, err := api.ValidateToken(reqToken, &perm)
+		if err != nil {
 			api.logger.Info("error validating token: ", err)
+			http.Error(writer, err.Error(), http.StatusForbidden)
+			return
+		}
+		err = api.ValidatePermission(userId, &perm)
+		if err != nil {
+			api.logger.Info("error getting permission", err)
 			http.Error(writer, "access denied", http.StatusForbidden)
 			return
 		}
 		servers := *api.Config.Servers
-		fmt.Println(perm.ConstructUrl(servers[perm.ServerId]))
+		api.logger.Info("accessing", perm.ConstructUrl(servers[perm.ServerId]))
 		fmt.Sprintf("%s %s", perm.Method, perm.ConstructUrl(servers[perm.ServerId]))
 		request, err := http.NewRequest(perm.Method, perm.ConstructUrl(servers[perm.ServerId]), req.Body)
 		if err != nil {
-			fmt.Println("error creating request: ", err)
+			api.logger.Info("error creating request: ", err)
 			http.Error(writer, "internal error", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("sending request")
 		client := &http.Client{}
 		response, err := client.Do(request)
 		if err != nil {
@@ -57,7 +62,6 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			return
 		}
 		defer response.Body.Close()
-		fmt.Println("reading data")
 		responseData, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println("error reading response data: ", err)

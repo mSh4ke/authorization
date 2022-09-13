@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"github.com/mSh4ke/authorization/models"
-	"log"
 )
 
 type RolePermRep struct {
@@ -40,27 +39,4 @@ func (RolePermRep *RolePermRep) RemovePermission(roleId int, permId int) error {
 		return err
 	}
 	return nil
-}
-
-func (RolePermRep *RolePermRep) ListRolePerms(roleId int) (*[]models.Permission, error) {
-	query := fmt.Sprintf("SELECT p.id,p. FROM %s AS rp ", rolePermTable) +
-		fmt.Sprintf("LEFT JOIN %s AS p ON rp.perm_id = p.id ", permTable) +
-		fmt.Sprintf("WHERE rp.role_id = %d", roleId)
-	fmt.Println(query)
-	rows, err := RolePermRep.storage.db.Query(query)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	defer rows.Close()
-	perms := make([]models.Permission, 0)
-	for rows.Next() {
-		var perm models.Permission
-		if err := rows.Scan(&perm.Id, &perm.Path, &perm.Method, &perm.ServerId); err != nil {
-			log.Println(err)
-			continue
-		}
-		perms = append(perms, perm)
-	}
-	return &perms, nil
 }

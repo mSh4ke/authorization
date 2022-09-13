@@ -110,14 +110,25 @@ func (api *API) ListUsers(wrt http.ResponseWriter, req *http.Request) {
 	if reqToken == "" && api.Config.UnauthorizedId != 0 {
 		return
 	}
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
+		api.logger.Info("error validating token: ", err)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
+		return
+	}
+	err = api.ValidatePermission(userId, &perm)
+	if err != nil {
 		api.logger.Info("error validating token: ", err)
 		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
 	fields := make([]models.Field, 0)
-	pgReq := models.PageRequest{Fields: &fields}
-	err := json.NewDecoder(req.Body).Decode(&pgReq)
+	pgReq := models.PageRequest{
+		PageNumber: 1,  //по умолчанию кидаем на первую страницу
+		PageLength: 10, //возможно стоит вынести в конфиг?
+		Fields:     &fields,
+	}
+	err = json.NewDecoder(req.Body).Decode(&pgReq)
 	if err != nil {
 		http.Error(wrt, "invalid json", 400)
 		return
@@ -174,8 +185,14 @@ func (api *API) GetUser(wrt http.ResponseWriter, req *http.Request) {
 	if reqToken == "" && api.Config.UnauthorizedId != 0 {
 		return
 	}
-	if err := api.ValidateToken(reqToken, &perm); err != nil {
+	userId, err := api.ValidateToken(reqToken)
+	if err != nil {
 		api.logger.Info("error validating token: ", err)
+		http.Error(wrt, err.Error(), http.StatusForbidden)
+		return
+	}
+	if err = api.ValidatePermission(userId, &perm); userId != uid && err != nil {
+		api.logger.Info("error getting permission", err)
 		http.Error(wrt, "access denied", http.StatusForbidden)
 		return
 	}
@@ -187,4 +204,8 @@ func (api *API) GetUser(wrt http.ResponseWriter, req *http.Request) {
 	}
 	json.NewEncoder(wrt).Encode(user)
 	wrt.WriteHeader(http.StatusOK)
+}
+
+func (api *API) UpdateUserProfile(wrt http.ResponseWriter, req *http.Request) {
+
 }
