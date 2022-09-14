@@ -51,6 +51,12 @@ type PageRequest struct {
 	TotalRecords int
 }
 
+func (pgReq PageRequest) New() *PageRequest {
+	Fields := make([]Field, 0)
+	pgReq.Fields = &Fields
+	return &pgReq
+}
+
 func (pgReq *PageRequest) Filters() string {
 	filterArray := make([]string, 0)
 	for _, field := range *pgReq.Fields {

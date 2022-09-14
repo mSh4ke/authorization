@@ -36,10 +36,10 @@ func (RolePermRep *RolePermRep) AddPermission(tx *sql.Tx, ctx *context.Context, 
 	return nil
 }
 
-const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id WHERE rp.roles_id = $1"
+const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN role as r or rp.roles_id = r.id"
 
-func (RolePermRep *RolePermRep) ListRolePerms(roleId int) (*[]models.Permission, error) {
-	rows, err := RolePermRep.storage.db.Query(ListRolePerms, roleId)
+func (RolePermRep *RolePermRep) ListRolePerms(pgReq *models.PageRequest) (*[]models.Permission, error) {
+	rows, err := RolePermRep.storage.db.Query(ListRolePerms + pgReq.PageReq())
 	if err != nil {
 		return nil, err
 	}
