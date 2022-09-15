@@ -30,7 +30,7 @@ func (a *API) configureRouterField() {
 	a.router.HandleFunc(prefix+"/admin/createRole", a.CreateRole).Methods("POST")
 	a.router.HandleFunc(prefix+"/admin/assignRole", a.AssignRole).Methods("POST")
 	a.router.HandleFunc(prefix+"/admin/listRoles", a.ListRoles).Methods("POST")
-	a.router.HandleFunc(prefix+"/admin/listPerms/", a.ListRolePerms).Methods("GET")
+	a.router.HandleFunc(prefix+"/admin/listPerms/", a.ListRolePerms).Methods("POST")
 	a.router.HandleFunc(prefix+"/admin/assignPerm", a.AssignPerm).Methods("POST")
 
 	//data handlers

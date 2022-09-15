@@ -48,7 +48,6 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 	}
 	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(msg)
-	return
 }
 
 func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
@@ -91,7 +90,6 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 	}
 	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(msg)
-	return
 }
 
 func (api *API) AssignPerm(wrt http.ResponseWriter, req *http.Request) {
@@ -146,7 +144,6 @@ func (api *API) AssignPerm(wrt http.ResponseWriter, req *http.Request) {
 	}
 	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(msg)
-	return
 }
 
 func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
@@ -186,7 +183,6 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 	}
 	wrt.WriteHeader(200)
 	json.NewEncoder(wrt).Encode(roles)
-	return
 }
 
 func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
@@ -227,11 +223,10 @@ func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 
 	roles, err := api.storage.RolePermRep.ListRolePerms(pgReq)
 	if err != nil {
-		log.Println("failed creating role: ", err)
+		log.Println("failed listing roleperms: ", err)
 		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
 	wrt.WriteHeader(http.StatusOK)
 	json.NewEncoder(wrt).Encode(roles)
-	return
 }
