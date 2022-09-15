@@ -3,9 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mSh4ke/authorization/models"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/mSh4ke/authorization/models"
 )
 
 func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
@@ -99,6 +101,15 @@ func (api *API) AssignPerm(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	if len(splitToken) != 2 {
+		log.Println("invalid token")
+		log.Println(reqToken)
+		http.Error(wrt, "invalid token", http.StatusForbidden)
+		return
+	}
+
+	reqToken = strings.TrimSpace(splitToken[1])
 	fmt.Println(reqToken)
 	userId, err := api.ValidateToken(reqToken)
 	if err != nil {
@@ -145,6 +156,15 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	if len(splitToken) != 2 {
+		log.Println("invalid token")
+		log.Println(reqToken)
+		http.Error(wrt, "invalid token", http.StatusForbidden)
+		return
+	}
+
+	reqToken = strings.TrimSpace(splitToken[1])
 	userId, err := api.ValidateToken(reqToken)
 	if err != nil {
 		api.logger.Info("error validating token: ", err)
@@ -177,6 +197,15 @@ func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 	}
 
 	reqToken := req.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	if len(splitToken) != 2 {
+		log.Println("invalid token")
+		log.Println(reqToken)
+		http.Error(wrt, "invalid token", http.StatusForbidden)
+		return
+	}
+
+	reqToken = strings.TrimSpace(splitToken[1])
 	fmt.Println(reqToken)
 	userId, err := api.ValidateToken(reqToken)
 	if err != nil {
