@@ -21,7 +21,7 @@ func (RolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permiss
 	query := fmt.Sprintf("SELECT p.req_server_id FROM %s AS rp ", rolePermTable) +
 		fmt.Sprintf("INNER JOIN %s AS u on u.role_id = rp.roles_id ", usersTable) +
 		fmt.Sprintf("INNER JOIN %s AS p on p.id = rp.permissions_id ", permTable) +
-		fmt.Sprintf("WHERE u.id = $1 AND p.req_path = $2 AND p.req_method = $3")
+		("WHERE u.id = $1 AND p.req_path = $2 AND p.req_method = $3")
 	if err := RolePermRep.storage.db.QueryRow(query, userId, perm.ParseUrl(), perm.Method).Scan(&perm.ServerId); err != nil {
 		fmt.Println(err)
 		return err
@@ -37,7 +37,7 @@ func (RolePermRep *RolePermRep) AddPermission(tx *sql.Tx, ctx *context.Context, 
 	return nil
 }
 
-const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN role AS r ON rp.roles_id = r.id"
+const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN roles AS r ON rp.roles_id = r.id"
 
 func (RolePermRep *RolePermRep) ListRolePerms(pgReq *models.PageRequest) (*[]models.Permission, error) {
 	rows, err := RolePermRep.storage.db.Query(ListRolePerms + pgReq.PageReq())
