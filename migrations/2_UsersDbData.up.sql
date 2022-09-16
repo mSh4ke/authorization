@@ -91,19 +91,19 @@ INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_images','DELETE',1);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_images','POST',1);
 
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_videos','GET',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_videos','DELETE',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_videos','POST',2);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_videos','GET',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_videos','DELETE',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products_videos','POST',1);
 
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes','GET',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes/param','DELETE',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes','POST',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes/param','PUT',2);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes','GET',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes/param','DELETE',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes','POST',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes/param','PUT',1);
 
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values','GET',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values/param','DELETE',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values','POST',2);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values/param','PUT',2);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values','GET',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values/param','DELETE',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values','POST',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values/param','PUT',1);
 
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values_products','GET',2);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/attributes_values_products','DELETE',2);

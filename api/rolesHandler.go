@@ -54,7 +54,7 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 	perm := models.Permission{
 		Path:     "/admin/assignRole",
-		Method:   "Post",
+		Method:   "POST",
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
@@ -96,7 +96,7 @@ func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {
 func (api *API) AssignPerm(wrt http.ResponseWriter, req *http.Request) {
 	perm := models.Permission{
 		Path:     "/admin/addPerm",
-		Method:   "Post",
+		Method:   "POST",
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
@@ -189,7 +189,7 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 	perm := models.Permission{
 		Path:     "/admin/listRolePerms",
-		Method:   "Get",
+		Method:   "POST",
 		ServerId: 0,
 	}
 
