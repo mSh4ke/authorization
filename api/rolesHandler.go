@@ -186,9 +186,9 @@ func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(wrt).Encode(roles)
 }
 
-func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
+func (api *API) ListPerms(wrt http.ResponseWriter, req *http.Request) {
 	perm := models.Permission{
-		Path:     "/admin/listRolePerms",
+		Path:     "/admin/ListPerms",
 		Method:   "POST",
 		ServerId: 0,
 	}
