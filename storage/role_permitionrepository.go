@@ -37,9 +37,13 @@ func (RolePermRep *RolePermRep) AddPermission(tx *sql.Tx, ctx *context.Context, 
 	return nil
 }
 
+const CountRolePerms = "SELECT COUNT(p.id) FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN roles AS r ON rp.roles_id = r.id"
 const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN roles AS r ON rp.roles_id = r.id"
 
 func (RolePermRep *RolePermRep) ListRolePerms(pgReq *models.PageRequest) (*[]models.Permission, error) {
+	if err := RolePermRep.storage.db.QueryRow(CountRolePerms + pgReq.PageReq()).Scan(&pgReq.TotalRecords); err != nil {
+		return nil, err
+	}
 	rows, err := RolePermRep.storage.db.Query(ListRolePerms + pgReq.PageReq())
 	if err != nil {
 		return nil, err

@@ -54,6 +54,8 @@ type PageRequest struct {
 func (pgReq PageRequest) New() *PageRequest {
 	Fields := make([]Field, 0)
 	pgReq.Fields = &Fields
+	pgReq.PageLength = 10
+	pgReq.PageNumber = 1
 	return &pgReq
 }
 

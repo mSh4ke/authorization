@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"strings"
 
@@ -195,9 +196,9 @@ func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 	reqToken := req.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
 	if len(splitToken) != 2 {
-		log.Println("invalid token")
+		log.Println("malformed token")
 		log.Println(reqToken)
-		http.Error(wrt, "invalid token", http.StatusForbidden)
+		http.Error(wrt, "malformed token", http.StatusForbidden)
 		return
 	}
 
@@ -221,12 +222,26 @@ func (api *API) ListRolePerms(wrt http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	roles, err := api.storage.RolePermRep.ListRolePerms(pgReq)
+	perms, err := api.storage.RolePermRep.ListRolePerms(pgReq)
 	if err != nil {
 		log.Println("failed listing roleperms: ", err)
 		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
+	res := struct {
+		PgNum    int `json:"pg_number"`
+		PgLen    int `json:"pg_length"`
+		TotalRec int `json:"total_rec"`
+		TotalPg  int `json:"total_pg"`
+		List     *[]models.Permission
+	}{
+		pgReq.PageNumber,
+		pgReq.PageLength,
+		pgReq.TotalRecords,
+		0,
+		perms,
+	}
+	res.TotalPg = int(math.Ceil(float64(res.TotalRec) / float64(res.PgLen)))
 	wrt.WriteHeader(http.StatusOK)
-	json.NewEncoder(wrt).Encode(roles)
+	json.NewEncoder(wrt).Encode(&res)
 }
