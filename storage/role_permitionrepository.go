@@ -38,7 +38,7 @@ func (RolePermRep *RolePermRep) AddPermission(tx *sql.Tx, ctx *context.Context, 
 }
 
 const CountRolePerms = "SELECT COUNT(p.id) FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN roles AS r ON rp.roles_id = r.id"
-const ListRolePerms = "SELECT p.id,p.req_path FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN roles AS r ON rp.roles_id = r.id"
+const ListRolePerms = "SELECT p.id,p.req_path,p.req_method FROM roles_permissions AS rp LEFT JOIN permissions AS p ON rp.permissions_id = p.id LEFT JOIN roles AS r ON rp.roles_id = r.id"
 
 func (RolePermRep *RolePermRep) ListRolePerms(pgReq *models.PageRequest) (*[]models.Permission, error) {
 	if err := RolePermRep.storage.db.QueryRow(CountRolePerms + pgReq.PageReq()).Scan(&pgReq.TotalRecords); err != nil {
@@ -52,7 +52,7 @@ func (RolePermRep *RolePermRep) ListRolePerms(pgReq *models.PageRequest) (*[]mod
 	perms := make([]models.Permission, 0)
 	for rows.Next() {
 		var perm models.Permission
-		if err := rows.Scan(&perm.Id, &perm.Path); err != nil {
+		if err := rows.Scan(&perm.Id, &perm.Path, &perm.Method); err != nil {
 			log.Println(err)
 			continue
 		}
