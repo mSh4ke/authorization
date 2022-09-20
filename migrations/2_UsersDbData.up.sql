@@ -5,7 +5,7 @@ INSERT INTO roles (id, name) VALUES (3,'unauthorized');
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/createRole','POST',0);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/assignRole','POST',0);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/ListRoles','POST',0);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/ListPerms/param','GET',0);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/ListPerms/param','POST',0);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/addPerm','POST',0);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/admin/removePerm','POST',0);
 

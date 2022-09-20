@@ -149,8 +149,8 @@ func (api *API) AssignPerm(wrt http.ResponseWriter, req *http.Request) {
 
 func (api *API) ListRoles(wrt http.ResponseWriter, req *http.Request) {
 	perm := models.Permission{
-		Path:     "/admin/listRoles",
-		Method:   "Get",
+		Path:     "/admin/ListRoles",
+		Method:   "POST",
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")

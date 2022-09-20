@@ -42,7 +42,7 @@ func (roleRep *roleRepository) ListRoles() (*[]models.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	roles := make([]models.Role, 10)
+	roles := make([]models.Role, 0)
 	defer Rows.Close()
 	for Rows.Next() {
 		var role models.Role
