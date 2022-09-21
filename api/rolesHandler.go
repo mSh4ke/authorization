@@ -18,8 +18,14 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 		ServerId: 0,
 	}
 	reqToken := req.Header.Get("Authorization")
-	fmt.Println(reqToken)
-	userId, err := api.ValidateToken(reqToken)
+	splitToken := strings.Split(reqToken, "Bearer ")
+	if len(splitToken) != 2 {
+		log.Println("invalid token")
+		log.Println(reqToken)
+		http.Error(wrt, "invalid token", http.StatusForbidden)
+		return
+	}
+	userId, err := api.ValidateToken(splitToken[1])
 	if err != nil {
 		api.logger.Info(err)
 		http.Error(wrt, err.Error(), http.StatusForbidden)
