@@ -41,7 +41,7 @@ func (fld *Field) IsValid() bool {
 	default:
 		return false
 	}
-	return regexp.MustCompile("^[a-zA-Zа-яА-Я0-9-/]+$").MatchString(fld.Value)
+	return regexp.MustCompile("^[a-zA-Zа-яА-Я0-9-/.]+$").MatchString(fld.Value)
 }
 
 type PageRequest struct {
