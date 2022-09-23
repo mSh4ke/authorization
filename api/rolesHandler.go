@@ -48,13 +48,8 @@ func (api *API) CreateRole(wrt http.ResponseWriter, req *http.Request) {
 		http.Error(wrt, "internal error", http.StatusInternalServerError)
 		return
 	}
-	msg := Message{
-		StatusCode: 200,
-		Message:    "success",
-		IsError:    false,
-	}
 	wrt.WriteHeader(http.StatusOK)
-	json.NewEncoder(wrt).Encode(msg)
+	json.NewEncoder(wrt).Encode(role)
 }
 
 func (api *API) AssignRole(wrt http.ResponseWriter, req *http.Request) {

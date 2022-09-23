@@ -13,8 +13,8 @@ type roleRepository struct {
 const roleTable string = "roles"
 
 func (roleRep *roleRepository) Create(role *models.Role) error {
-	query := fmt.Sprintf("INSERT INTO %s (name) VALUES ('$1')", roleTable)
-	if _, err := roleRep.storage.db.Query(query, role.Name); err != nil {
+	query := fmt.Sprintf("INSERT INTO %s (name) VALUES ('$1') RETURNING id", roleTable)
+	if err := roleRep.storage.db.QueryRow(query, role.Name).Scan(&role.Id); err != nil {
 		return err
 	}
 	return nil
