@@ -41,7 +41,7 @@ func (userRep *Userrepository) AuthenticateUser(user *models.User) error {
 		return err
 	}
 	if !user.ValidatePassword([]byte(passwordHash)) {
-		return errors.New("Invalid password")
+		return errors.New("invalid password")
 	}
 	return nil
 }
@@ -75,7 +75,7 @@ func (userRep *Userrepository) EditProfile(userprf models.UserProfile, userId in
 }
 
 func (userRep *Userrepository) List(pgReq *models.PageRequest) (*[]models.User, error) {
-	query := ("SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id" + pgReq.PageReq())
+	query := "SELECT u.id,u.display_name,u.role_id,r.name FROM users AS u LEFT JOIN roles AS r ON r.id = u.role_id" + pgReq.PageReq()
 	rows, err := userRep.storage.db.Query(query)
 	if err != nil {
 		log.Println(err)

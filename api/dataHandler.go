@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/mSh4ke/authorization/models"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -62,7 +62,7 @@ func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req
 			return
 		}
 		defer response.Body.Close()
-		responseData, err := ioutil.ReadAll(response.Body)
+		responseData, err := io.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println("error reading response data: ", err)
 			http.Error(writer, "internal error", http.StatusInternalServerError)

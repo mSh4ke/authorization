@@ -10,41 +10,41 @@ var (
 	prefix = "/api/v2"
 )
 
-func (a *API) configureLoggerField() error {
+func (api *API) configureLoggerField() error {
 
-	log_level, err := logrus.ParseLevel(a.Config.LoggerLevel)
+	log_level, err := logrus.ParseLevel(api.Config.LoggerLevel)
 	if err != nil {
 		return err
 	}
-	a.logger.SetLevel(log_level)
+	api.logger.SetLevel(log_level)
 	return nil
 }
-func (a *API) configureRouterField() {
+func (api *API) configureRouterField() {
 	//users handlers
-	a.router.HandleFunc(prefix+"/users/register", a.RegisterUser).Methods("POST")
-	a.router.HandleFunc(prefix+"/users/auth", a.Authenticate).Methods("POST")
-	a.router.HandleFunc(prefix+"/users/list", a.ListUsers).Methods("POST")
-	a.router.HandleFunc(prefix+"/users/{id}", a.GetUser).Methods("GET")
+	api.router.HandleFunc(prefix+"/users/register", api.RegisterUser).Methods("POST")
+	api.router.HandleFunc(prefix+"/users/auth", api.Authenticate).Methods("POST")
+	api.router.HandleFunc(prefix+"/users/list", api.ListUsers).Methods("POST")
+	api.router.HandleFunc(prefix+"/users/{id}", api.GetUser).Methods("GET")
 
 	//admin
-	a.router.HandleFunc(prefix+"/admin/createRole", a.CreateRole).Methods("POST")
-	a.router.HandleFunc(prefix+"/admin/assignRole", a.AssignRole).Methods("POST")
-	a.router.HandleFunc(prefix+"/admin/listRoles", a.ListRoles).Methods("POST")
-	a.router.HandleFunc(prefix+"/admin/listPerms", a.ListPerms).Methods("POST")
-	a.router.HandleFunc(prefix+"/admin/assignPerm", a.AssignPerm).Methods("POST")
+	api.router.HandleFunc(prefix+"/admin/createRole", api.CreateRole).Methods("POST")
+	api.router.HandleFunc(prefix+"/admin/assignRole", api.AssignRole).Methods("POST")
+	api.router.HandleFunc(prefix+"/admin/listRoles", api.ListRoles).Methods("POST")
+	api.router.HandleFunc(prefix+"/admin/listPerms", api.ListPerms).Methods("POST")
+	api.router.HandleFunc(prefix+"/admin/assignPerm", api.AssignPerm).Methods("POST")
 
 	//data handlers
-	a.router.HandleFunc(prefix+"/data/{endpoint}/{param}", a.RouteHandler("GET")).Methods("GET")
-	a.router.HandleFunc(prefix+"/data/{endpoint}/{param}", a.RouteHandler("POST")).Methods("POST")
-	a.router.HandleFunc(prefix+"/data/{endpoint}/{param}", a.RouteHandler("PUT")).Methods("PUT")
-	a.router.HandleFunc(prefix+"/data/{endpoint}/{param}", a.RouteHandler("DELETE")).Methods("DELETE")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("GET")).Methods("GET")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("POST")).Methods("POST")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("PUT")).Methods("PUT")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("DELETE")).Methods("DELETE")
 }
-func (a *API) configureStorageField() error {
-	storage := storage.New(a.Config.Storage)
+func (api *API) configureStorageField() error {
+	storage := storage.New(api.Config.Storage)
 
 	if err := storage.Open(); err != nil {
 		return err
 	}
-	a.storage = storage
+	api.storage = storage
 	return nil
 }
