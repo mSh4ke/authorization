@@ -31,7 +31,7 @@ func (RolePermRep *RolePermRep) CheckPermission(userId int, perm *models.Permiss
 
 func (RolePermRep *RolePermRep) AddPermission(tx *sql.Tx, ctx *context.Context, roleId int, permId int) error {
 	query := fmt.Sprintf("INSERT INTO %s (roles_id,permissions_id) VALUES ($1,$2)", rolePermTable)
-	if _, err := tx.QueryContext(*ctx, query, roleId, permId); err != nil {
+	if _, err := tx.ExecContext(*ctx, query, roleId, permId); err != nil {
 		return err
 	}
 	return nil

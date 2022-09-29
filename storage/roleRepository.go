@@ -42,8 +42,8 @@ func (roleRep *roleRepository) ListRoles() (*[]models.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	roles := make([]models.Role, 0)
 	defer Rows.Close()
+	roles := make([]models.Role, 0)
 	for Rows.Next() {
 		var role models.Role
 		if err := Rows.Scan(&role.Id, &role.Name); err != nil {
