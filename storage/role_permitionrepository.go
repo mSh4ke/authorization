@@ -69,11 +69,11 @@ func (RolePermRep *RolePermRep) AssignPermissions(roleId int, permsId *[]int) er
 	if err != nil {
 		return err
 	}
-	if _, err = tx.QueryContext(ctx, ClearRolePerms, roleId); err != nil {
+	if _, err = tx.ExecContext(ctx, ClearRolePerms, roleId); err != nil {
 		tx.Rollback()
 		return err
 	}
-	for permId := range *permsId {
+	for _, permId := range *permsId {
 		if err := RolePermRep.AddPermission(tx, &ctx, roleId, permId); err != nil {
 			tx.Rollback()
 			return err
