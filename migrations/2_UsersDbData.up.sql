@@ -82,7 +82,7 @@ INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/categori
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/categories/param','DELETE',1);
 
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products','GET',1);
-INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/product/param','GET',1);
+INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products/param','GET',1);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products/param','DELETE',1);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products/param','PUT',1);
 INSERT INTO permissions (req_path, req_method, req_server_id) VALUES ('/products','POST',1);
