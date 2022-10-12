@@ -34,10 +34,12 @@ func (api *API) configureRouterField() {
 	api.router.HandleFunc(prefix+"/admin/assignPerm", api.AssignPerm).Methods("POST")
 
 	//data handlers
-	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("GET")).Methods("GET")
-	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("POST")).Methods("POST")
-	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("PUT")).Methods("PUT")
-	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("DELETE")).Methods("DELETE")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("GET", "")).Methods("GET")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("POST", "")).Methods("POST")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("PUT", "")).Methods("PUT")
+	api.router.HandleFunc(prefix+"/data/{endpoint}/{param}", api.RouteHandler("DELETE", "")).Methods("DELETE")
+	api.router.HandleFunc(prefix+"/data/documents/{endpoint}/{param}", api.RouteHandler("PUT", "documents")).Methods("PUT")
+	api.router.HandleFunc(prefix+"/data/documents/{endpoint}/{param}", api.RouteHandler("PUT", "documents")).Methods("PUT")
 }
 func (api *API) configureStorageField() error {
 	storage := storage.New(api.Config.Storage)

@@ -10,11 +10,10 @@ import (
 	"strings"
 )
 
-func (api *API) RouteHandler(method string) func(writer http.ResponseWriter, req *http.Request) {
+func (api *API) RouteHandler(method string, prefix string) func(writer http.ResponseWriter, req *http.Request) {
 	return func(writer http.ResponseWriter, req *http.Request) {
 		var perm models.Permission
-
-		perm.Path = "/" + mux.Vars(req)["endpoint"]
+		perm.Path = prefix + "/" + mux.Vars(req)["endpoint"]
 		if mux.Vars(req)["param"] != "post" {
 			perm.Path = perm.Path + "/" + mux.Vars(req)["param"]
 		}
